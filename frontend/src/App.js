@@ -1,14 +1,14 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Gallery from "./pages/Gallery";
+import UploadMedia from "./components/UploadMedia";
+import Gallery from "./components/Gallery";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/gallery" element={<Gallery />} />
-      </Routes>
-    </Router>
+    <div style={{ padding: "2rem" }}>
+      <h1>🚀 100ttani Motoclub</h1>
+      <UploadMedia />
+      <Gallery />
+    </div>
   );
 }
 
