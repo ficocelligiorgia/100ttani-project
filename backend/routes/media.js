@@ -21,6 +21,7 @@ router.post("/", verifyToken, upload.single("file"), async (req, res) => {
     });
 
     await newMedia.save();
+    console.log("MEDIA SALVATO:", newMedia);
     res.status(201).json({ message: "Media caricato!", media: newMedia });
   } catch (err) {
     res.status(500).json({ message: "Errore durante l'upload", error: err });
@@ -35,5 +36,57 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Errore nel recupero", error: err });
   }
 });
+
+router.post("/:id/like", verifyToken, async (req, res) => {
+  const media = await Media.findById(req.params.id);
+  if (!media) return res.status(404).json({ message: "Media non trovato" });
+
+  const alreadyLiked = media.likes.includes(req.user.id);
+
+  if (alreadyLiked) {
+    media.likes.pull(req.user.id);
+  } else {
+    media.likes.push(req.user.id);
+  }
+
+  await media.save();
+  res.json({ liked: !alreadyLiked, totalLikes: media.likes.length });
+});
+
+router.post("/:id/comment", verifyToken, async (req, res) => {
+  const { text } = req.body;
+
+  if (!text) return res.status(400).json({ message: "Testo del commento mancante" });
+
+  const media = await Media.findById(req.params.id);
+  if (!media) return res.status(404).json({ message: "Media non trovato" });
+
+  media.comments.push({ user: req.user.id, text });
+  await media.save();
+
+  res.status(201).json({ message: "Commento aggiunto", comments: media.comments });
+});
+
+router.delete("/:id", verifyToken, async (req, res) => {
+  try {
+    const media = await Media.findById(req.params.id);
+
+    if (!media) {
+      return res.status(404).json({ message: "Media non trovato" });
+    }
+
+   
+    if (media.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Non autorizzato" });
+    }
+
+    await Media.findByIdAndDelete(req.params.id);
+    res.json({ message: "Media eliminato con successo" });
+  } catch (err) {
+    console.error("Errore nella cancellazione:", err);
+    res.status(500).json({ message: "Errore del server" });
+  }
+});
+
 
 module.exports = router;
