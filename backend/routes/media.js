@@ -30,12 +30,17 @@ router.post("/", verifyToken, upload.single("file"), async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const media = await Media.find().sort({ createdAt: -1 });
+    const media = await Media.find()
+      .sort({ createdAt: -1 })
+      .populate("userId", "username email") 
+      .populate("comments.user", "username email"); 
+
     res.json(media);
   } catch (err) {
     res.status(500).json({ message: "Errore nel recupero", error: err });
   }
 });
+
 
 router.post("/:id/like", verifyToken, async (req, res) => {
   const media = await Media.findById(req.params.id);
@@ -55,17 +60,28 @@ router.post("/:id/like", verifyToken, async (req, res) => {
 
 router.post("/:id/comment", verifyToken, async (req, res) => {
   const { text } = req.body;
+  const mediaId = req.params.id;
 
-  if (!text) return res.status(400).json({ message: "Testo del commento mancante" });
+  try {
+    const media = await Media.findById(mediaId);
+    if (!media) return res.status(404).json({ message: "Media non trovato" });
 
-  const media = await Media.findById(req.params.id);
-  if (!media) return res.status(404).json({ message: "Media non trovato" });
+    const comment = {
+      text,
+      user: req.user.id,
+      createdAt: new Date(),
+    };
 
-  media.comments.push({ user: req.user.id, text });
-  await media.save();
+    media.comments.push(comment);
+    await media.save();
 
-  res.status(201).json({ message: "Commento aggiunto", comments: media.comments });
+    res.status(201).json({ message: "Commento aggiunto", comment });
+  } catch (err) {
+    res.status(500).json({ message: "Errore nel commento", error: err });
+  }
 });
+
+
 
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
@@ -75,7 +91,6 @@ router.delete("/:id", verifyToken, async (req, res) => {
       return res.status(404).json({ message: "Media non trovato" });
     }
 
-   
     if (media.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: "Non autorizzato" });
     }

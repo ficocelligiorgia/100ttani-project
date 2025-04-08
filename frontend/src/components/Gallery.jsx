@@ -8,16 +8,7 @@ function Gallery() {
   const [commentText, setCommentText] = useState({});
 
   const token = localStorage.getItem("token");
-  let user = null;
-try {
-  const token = localStorage.getItem("token");
-  if (token) {
-    user = jwtDecode(token);
-  }
-} catch (err) {
-  console.warn("Token non valido o scaduto:", err.message);
-}
-
+  const user = token ? jwtDecode(token) : null;
 
   useEffect(() => {
     fetchMedia();
@@ -64,7 +55,6 @@ try {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Sei sicura di voler eliminare questo post?")) return;
-
     try {
       await axios.delete(`http://localhost:5000/media/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -116,7 +106,7 @@ try {
                 />
               )}
 
-              
+              {/* ❤️ Like */}
               <div style={{ marginTop: "1rem" }}>
                 <button onClick={() => handleLike(media._id)}>❤️ Like</button>
                 <span style={{ marginLeft: "1rem" }}>
@@ -124,7 +114,7 @@ try {
                 </span>
               </div>
 
-            
+              {/* 💬 Commento */}
               <div style={{ marginTop: "1rem" }}>
                 <input
                   type="text"
@@ -141,12 +131,13 @@ try {
                 <button onClick={() => handleComment(media._id)}>💬</button>
               </div>
 
+              {/* Lista commenti */}
               <div style={{ marginTop: "1rem" }}>
                 <h5>Commenti:</h5>
                 {media.comments && media.comments.length > 0 ? (
                   media.comments.map((c, index) => (
                     <p key={index} style={{ fontSize: "0.9rem" }}>
-                      • {c.text}
+                      <strong>{c.user?.username || "Utente"}:</strong> {c.text}
                     </p>
                   ))
                 ) : (
@@ -154,23 +145,23 @@ try {
                 )}
               </div>
 
-              
-              {user && user.id === media.userId && (
-                <button
-                  onClick={() => handleDelete(media._id)}
+              {user && media.userId && user.id === media.userId._id && (
+              <button
+                onClick={() => handleDelete(media._id)}
                   style={{
-                    marginTop: "1rem",
-                    backgroundColor: "crimson",
-                    color: "white",
-                    border: "none",
-                    padding: "0.4rem 0.8rem",
-                    borderRadius: "6px",
-                    cursor: "pointer",
+                  marginTop: "1rem",
+                  backgroundColor: "crimson",
+                  color: "white",
+                  border: "none",
+                  padding: "0.4rem 0.8rem",
+                  borderRadius: "6px",
+                  cursor: "pointer",
                   }}
-                >
-                  🗑️ Elimina
-                </button>
+              >
+              🗑️ Elimina
+              </button>
               )}
+
             </div>
           ))}
         </div>

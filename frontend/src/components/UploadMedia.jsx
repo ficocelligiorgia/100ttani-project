@@ -4,6 +4,28 @@ function UploadMedia() {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [filePreview, setFilePreview] = useState(null); // Stato per l'anteprima
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+
+    if (selectedFile) {
+      // Se è un'immagine
+      if (selectedFile.type.startsWith("image")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFilePreview(reader.result); // Imposta l'anteprima dell'immagine
+        };
+        reader.readAsDataURL(selectedFile);
+      } else if (selectedFile.type.startsWith("video")) {
+        // Se è un video
+        const videoUrl = URL.createObjectURL(selectedFile);
+        setFilePreview(videoUrl); // Imposta l'anteprima del video
+      }
+
+      setFile(selectedFile); // Imposta il file da caricare
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,11 +56,12 @@ function UploadMedia() {
         setMessage("✅ Media caricato con successo!");
         setTitle("");
         setFile(null);
+        setFilePreview(null); // Resetta l'anteprima
       } else {
         setMessage(`❌ Errore: ${data.message}`);
       }
     } catch (err) {
-      console.error("Errore durante l'upload:", err);
+      console.error("Errore durante il caricamento:", err);
       setMessage("❌ Errore durante il caricamento.");
     }
   };
@@ -46,6 +69,7 @@ function UploadMedia() {
   return (
     <div style={{ padding: "2rem" }}>
       <h1>📤 Carica un Media</h1>
+
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1rem" }}>
           <label>Titolo: </label>
@@ -62,11 +86,33 @@ function UploadMedia() {
           <label>File: </label>
           <input
             type="file"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={handleFileChange}
             style={{ marginLeft: "1rem" }}
             required
           />
         </div>
+
+        {filePreview && (
+          <div style={{ marginBottom: "1rem" }}>
+            <h4>Anteprima:</h4>
+            {filePreview && filePreview.startsWith("data:image") ? (
+              <img
+                src={filePreview}
+                alt="Anteprima"
+                style={{
+                  width: "100%",
+                  maxHeight: "300px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+              />
+            ) : (
+              <video controls style={{ width: "100%", maxHeight: "300px", borderRadius: "8px" }}>
+                <source src={filePreview} />
+              </video>
+            )}
+          </div>
+        )}
 
         <button
           type="submit"
