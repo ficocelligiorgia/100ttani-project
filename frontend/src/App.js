@@ -5,6 +5,7 @@ import UploadMedia from "./components/UploadMedia";
 import Gallery from "./components/Gallery";
 import Notification from "./components/Notification";
 import Navbar from "./components/Navbar";
+import Home from "./components/Home";
 
 const lightTheme = {
   background: "#ffffff",
@@ -33,7 +34,7 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [isDark, setIsDark] = useState(false);
-  const [activeSection, setActiveSection] = useState("gallery");
+  const [activeSection, setActiveSection] = useState("home");
 
   const themeStyles = isDark ? darkTheme : lightTheme;
 
@@ -41,12 +42,14 @@ function App() {
     localStorage.setItem("token", receivedToken);
     setToken(receivedToken);
     showNotification("✅ Login effettuato!", "success");
+    setActiveSection("home");
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setToken(null);
     showNotification("🔓 Logout effettuato", "info");
+    setActiveSection("home");
   };
 
   const showNotification = (message, type = "info") => {
@@ -66,16 +69,32 @@ function App() {
       <Navbar
         isLoggedIn={!!token}
         onLogout={handleLogout}
-        onToggleAuth={() => setShowLogin(!showLogin)}
+        onToggleAuth={() => {
+          setActiveSection("auth");
+          setShowLogin(true);
+        }}
         isDark={isDark}
         onToggleTheme={toggleTheme}
         onNavigate={setActiveSection}
       />
 
-      <div style={{ padding: "2rem" }}>
+      <div style={{ padding: "0", minHeight: "100vh" }}>
         <Notification message={notification.message} type={notification.type} />
 
-        {!token ? (
+        {activeSection === "home" && (
+          <Home
+            theme={themeStyles}
+            isDark={isDark}
+            isLoggedIn={!!token}
+            onNavigate={setActiveSection}
+            onShowLogin={() => {
+              setShowLogin(true);
+              setActiveSection("auth");
+            }}
+          />
+        )}
+
+        {activeSection === "auth" && !token && (
           <>
             {showLogin ? (
               <Login onLoginSuccess={handleLoginSuccess} />
@@ -98,23 +117,22 @@ function App() {
               </button>
             </p>
           </>
-        ) : (
-          <>
-            {activeSection === "upload" && (
-              <UploadMedia
-                onNotify={showNotification}
-                theme={themeStyles}
-                onUploadSuccess={() => setActiveSection("gallery")} // ✅ Redireziona alla galleria
-              />
-            )}
-            {activeSection === "gallery" && (
-              <Gallery
-                onNotify={showNotification}
-                theme={themeStyles}
-                onAddPostClick={() => setActiveSection("upload")}
-              />
-            )}
-          </>
+        )}
+
+        {activeSection === "upload" && token && (
+          <UploadMedia
+            onNotify={showNotification}
+            theme={themeStyles}
+            onUploadSuccess={() => setActiveSection("gallery")}
+          />
+        )}
+
+        {activeSection === "gallery" && token && (
+          <Gallery
+            onNotify={showNotification}
+            theme={themeStyles}
+            onAddPostClick={() => setActiveSection("upload")}
+          />
         )}
       </div>
     </>
