@@ -19,20 +19,20 @@ function Login({ onLoginSuccess }) {
 
       if (res.ok) {
         onLoginSuccess(data.token);
-        setMessage("✅ Login riuscito!");
+        setMessage(" Login riuscito!");
         console.log("Token salvato:", data.token);
       } else {
-        setMessage(`❌ ${data.message}`);
+        setMessage(` ${data.message}`);
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Errore di connessione al server");
+      setMessage(" Errore di connessione al server");
     }
   };
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h2>🔐 Login</h2>
+      <h2> Login</h2>
 
       <form onSubmit={handleLogin}>
         <input

@@ -1,75 +1,82 @@
 import React from "react";
 
-function Navbar({ isLoggedIn, onLogout, onToggleAuth, onToggleTheme, isDark }) {
+function Navbar({ isLoggedIn, onLogout, onToggleAuth, isDark, onToggleTheme, onNavigate }) {
   return (
     <nav
       style={{
         display: "flex",
-        alignItems: "center",
         justifyContent: "space-between",
+        alignItems: "center",
         backgroundColor: "#222",
         padding: "1rem 2rem",
-        color: "white",
+        color: "#fff",
+        fontFamily: "sans-serif",
       }}
     >
-      {/* LOGO CLICCABILE */}
-      <a href="/" style={{ display: "flex", alignItems: "center" }}>
-        <img
-          src="/logo.png"
-          alt="100ttani Logo"
-          style={{ height: "50px", marginRight: "1rem", cursor: "pointer" }}
-        />
+      <a href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none", color: "#fff" }}>
+        <img src="/logo.png" alt="Logo" style={{ height: "45px", marginRight: "0.75rem" }} />
       </a>
 
-      {/* SWITCH TEMA */}
-      <div style={{ display: "flex", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+        {isLoggedIn && (
+          <>
+            <NavLink label=" Home" onClick={() => onNavigate("home")} />
+            <NavLink label=" Galleria" onClick={() => onNavigate("gallery")} />
+            <NavLink label=" Profilo" onClick={() => onNavigate("profile")} />
+            <NavLink label=" Eventi" onClick={() => onNavigate("events")} />
+            <NavLink label=" Shop" onClick={() => onNavigate("shop")} />
+            <NavLink label=" Info" onClick={() => onNavigate("about")} />
+          </>
+        )}
+
         <button
           onClick={onToggleTheme}
+          title="Cambia tema"
           style={{
-            backgroundColor: "#555",
-            color: "#fff",
-            padding: "0.4rem 1rem",
+            background: "transparent",
             border: "none",
-            borderRadius: "5px",
-            marginRight: "1rem",
+            fontSize: "1.2rem",
+            color: "#fff",
             cursor: "pointer",
           }}
         >
-          🌓 Tema {isDark ? "Chiaro" : "Scuro"}
+          {isDark ? "☀️" : "🌙"}
         </button>
 
-        {/* PULSANTI LOGIN / LOGOUT */}
         {isLoggedIn ? (
-          <button
+          <NavLink
+            label=" Logout"
             onClick={onLogout}
-            style={{
-              backgroundColor: "crimson",
-              color: "white",
-              border: "none",
-              padding: "0.5rem 1rem",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            🔓 Logout
-          </button>
+            styleOverride={{ color: "crimson" }}
+          />
         ) : (
-          <button
-            onClick={onToggleAuth}
-            style={{
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              padding: "0.5rem 1rem",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            🔐 Login / Register
-          </button>
+          <NavLink label=" Login / Register" onClick={onToggleAuth} />
         )}
       </div>
     </nav>
+  );
+}
+
+function NavLink({ label, onClick, styleOverride = {} }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: "transparent",
+        border: "none",
+        color: "#ccc",
+        fontSize: "0.95rem",
+        cursor: "pointer",
+        padding: "0.3rem 0.6rem",
+        borderRadius: "4px",
+        transition: "color 0.2s, background 0.2s",
+        ...styleOverride,
+      }}
+      onMouseOver={(e) => (e.target.style.color = "#fff")}
+      onMouseOut={(e) => (e.target.style.color = styleOverride.color || "#ccc")}
+    >
+      {label}
+    </button>
   );
 }
 

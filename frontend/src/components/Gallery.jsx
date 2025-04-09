@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { FaPlus } from "react-icons/fa";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import Spinner from "./Spinner";
 
-function Gallery({ onNotify, theme }) {
+function Gallery({ onNotify, theme, onAddPostClick }) {
   const [mediaList, setMediaList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState({});
@@ -10,7 +12,6 @@ function Gallery({ onNotify, theme }) {
   const token = localStorage.getItem("token");
   const user = token ? jwtDecode(token) : null;
 
-  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -23,18 +24,22 @@ function Gallery({ onNotify, theme }) {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [onNotify]);
-
 
   const fetchMedia = async () => {
     try {
       const res = await axios.get("http://localhost:5000/media");
       setMediaList(res.data);
-    } catch (err) {
-      console.error("Errore nel recupero dei media:", err);
-      onNotify("Errore nel recupero dei media.", "error");
+    } catch (error) {
+      if (error.code === 'ECONNREFUSED') {
+        console.error(" Connessione rifiutata. Assicurati che il server sia in esecuzione.");
+        onNotify(" Connessione rifiutata al server. Verifica che sia attivo.", "error");
+      } else {
+        console.error("Si è verificato un errore:", error.message);
+        onNotify(" Errore nel recupero dei media: " + error.message, "error");
+      }
     } finally {
       setLoading(false);
     }
@@ -64,7 +69,7 @@ function Gallery({ onNotify, theme }) {
       );
       setCommentText({ ...commentText, [id]: "" });
       fetchMedia();
-      onNotify("💬 Commento aggiunto!", "success");
+      onNotify("Commento aggiunto!", "success");
     } catch (err) {
       console.error("Errore nel commento:", err);
       onNotify("Errore nel commento", "error");
@@ -72,14 +77,14 @@ function Gallery({ onNotify, theme }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Sei sicura di voler eliminare questo post?")) return;
+    if (!window.confirm("Sei sicuro di voler eliminare questo post?")) return;
 
     try {
       await axios.delete(`http://localhost:5000/media/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchMedia();
-      onNotify("🗑️ Post eliminato con successo!", "success");
+      onNotify("Post eliminato con successo!", "success");
     } catch (err) {
       console.error("Errore nella cancellazione:", err);
       onNotify("Errore nella cancellazione", "error");
@@ -88,18 +93,44 @@ function Gallery({ onNotify, theme }) {
 
   return (
     <div style={{ padding: "2rem", color: theme.color }}>
-      <h2>🖼️ Galleria</h2>
+      {/* Bottone Aggiungi Post */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
+        <button
+          onClick={onAddPostClick}
+          style={{
+            backgroundColor: theme.buttonBackground,
+            color: theme.buttonColor,
+            border: "none",
+            borderRadius: "50%",
+            width: "42px",
+            height: "42px",
+            fontSize: "1.4rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          }}
+          title="Aggiungi post"
+        >
+          <FaPlus />
+        </button>
+      </div>
+
+      <h2>Galleria</h2>
 
       {loading ? (
-        <p>Caricamento in corso...</p>
+        <Spinner theme={theme} />
       ) : mediaList.length === 0 ? (
         <p>Nessun media disponibile.</p>
       ) : (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-            gap: "1.5rem",
+            gridTemplateColumns: "1fr",
+            gap: "2rem",
+            maxWidth: "600px",
+            margin: "0 auto",
           }}
         >
           {mediaList.map((media) => (
@@ -110,20 +141,18 @@ function Gallery({ onNotify, theme }) {
                 color: theme.color,
                 border: `1px solid ${theme.borderColor}`,
                 borderRadius: "10px",
-                padding: "1rem",
-                boxShadow: theme.shadow || "0 0 8px rgba(0,0,0,0.1)",
+                overflow: "hidden",
+                boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
               }}
             >
-              <h4>{media.title || "Senza titolo"}</h4>
-
               {media.fileType === "image" ? (
                 <img
                   src={`http://localhost:5000${media.fileUrl}`}
                   alt={media.title}
                   style={{
                     width: "100%",
-                    borderRadius: "8px",
-                    marginBottom: "1rem",
+                    maxHeight: "500px",
+                    objectFit: "cover",
                   }}
                 />
               ) : (
@@ -132,141 +161,131 @@ function Gallery({ onNotify, theme }) {
                   src={`http://localhost:5000${media.fileUrl}`}
                   style={{
                     width: "100%",
-                    borderRadius: "8px",
-                    marginBottom: "1rem",
+                    maxHeight: "500px",
+                    objectFit: "cover",
                   }}
                 />
               )}
 
-              <div style={{ marginTop: "0.5rem" }}>
-                <button
-                  onClick={() => handleLike(media._id)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: theme.color,
-                    cursor: "pointer",
-                  }}
-                >
-                  ❤️ Like
-                </button>
-                <span style={{ marginLeft: "1rem" }}>
+              <div style={{ padding: "1rem" }}>
+                <h4>{media.title || "Senza titolo"}</h4>
+
+                <div style={{ marginTop: "0.5rem", marginBottom: "1rem" }}>
+                  <button
+                    onClick={() => handleLike(media._id)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      fontSize: "1.2rem",
+                      cursor: "pointer",
+                      color: theme.color,
+                    }}
+                  >
+                    ❤️
+                  </button>{" "}
                   {media.likes?.length || 0} like
-                </span>
-              </div>
+                </div>
 
-              <div style={{ marginTop: "1rem" }}>
-                <input
-                  type="text"
-                  value={commentText[media._id] || ""}
-                  onChange={(e) =>
-                    setCommentText({
-                      ...commentText,
-                      [media._id]: e.target.value,
-                    })
-                  }
-                  placeholder="Scrivi un commento..."
-                  style={{
-                    width: "80%",
-                    padding: "0.5rem",
-                    backgroundColor: theme.inputBackground,
-                    color: theme.inputText,
-                    border: `1px solid ${theme.borderColor}`,
-                    borderRadius: "5px",
-                  }}
-                />
-                <button
-                  onClick={() => handleComment(media._id)}
-                  style={{
-                    marginLeft: "0.5rem",
-                    padding: "0.4rem 1rem",
-                    backgroundColor: theme.buttonBackground,
-                    color: theme.buttonColor,
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  💬
-                </button>
-              </div>
+                <div>
+                  <input
+                    type="text"
+                    value={commentText[media._id] || ""}
+                    onChange={(e) =>
+                      setCommentText({
+                        ...commentText,
+                        [media._id]: e.target.value,
+                      })
+                    }
+                    placeholder="Scrivi un commento..."
+                    style={{
+                      width: "100%",
+                      padding: "0.5rem",
+                      marginBottom: "0.5rem",
+                      backgroundColor: theme.inputBackground,
+                      color: theme.inputText,
+                      border: `1px solid ${theme.borderColor}`,
+                      borderRadius: "6px",
+                    }}
+                  />
+                  <button
+                    onClick={() => handleComment(media._id)}
+                    style={{
+                      padding: "0.4rem 1rem",
+                      backgroundColor: theme.buttonBackground,
+                      color: theme.buttonColor,
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Invia
+                  </button>
+                </div>
 
-              <div style={{ marginTop: "1rem" }}>
-                <h5>Commenti:</h5>
-                {media.comments && media.comments.length > 0 ? (
-                  media.comments.map((c, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        marginBottom: "1rem",
-                      }}
-                    >
+                <div style={{ marginTop: "1rem" }}>
+                  <h5>Commenti:</h5>
+                  {media.comments && media.comments.length > 0 ? (
+                    media.comments.map((c, index) => (
                       <div
+                        key={index}
                         style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
-                          backgroundColor: "#888",
-                          color: "#fff",
                           display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                          marginRight: "0.75rem",
-                          fontSize: "0.9rem",
+                          alignItems: "flex-start",
+                          marginBottom: "0.8rem",
                         }}
                       >
-                        {c.user?.username?.charAt(0).toUpperCase() || "?"}
-                      </div>
-                      <div
-                        style={{
-                          background: theme.inputBackground,
-                          padding: "0.75rem",
-                          borderRadius: "12px",
-                          border: `1px solid ${theme.borderColor}`,
-                          maxWidth: "80%",
-                          color: theme.color,
-                        }}
-                      >
-                        <strong>{c.user?.username || "Anonimo"}</strong>
-                        <p style={{ margin: "0.25rem 0 0.5rem" }}>{c.text}</p>
-                        <span
-                          style={{ fontSize: "0.75rem", color: theme.color }}
+                        <div
+                          style={{
+                            width: "35px",
+                            height: "35px",
+                            borderRadius: "50%",
+                            backgroundColor: "#888",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginRight: "0.75rem",
+                            fontWeight: "bold",
+                          }}
                         >
-                          {new Date(c.createdAt).toLocaleString("it-IT", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
+                          {c.user?.username?.charAt(0).toUpperCase() || "?"}
+                        </div>
+                        <div>
+                          <strong>{c.user?.username || "Anonimo"}:</strong> {c.text}
+                          <div style={{ fontSize: "0.75rem", color: "#aaa" }}>
+                            {new Date(c.createdAt).toLocaleString("it-IT", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <p style={{ color: theme.color }}>Nessun commento ancora.</p>
+                    ))
+                  ) : (
+                    <p style={{ color: theme.color }}>Nessun commento ancora.</p>
+                  )}
+                </div>
+
+                {user && media.userId && user.id === media.userId._id && (
+                  <button
+                    onClick={() => handleDelete(media._id)}
+                    style={{
+                      marginTop: "1rem",
+                      backgroundColor: "crimson",
+                      color: "white",
+                      border: "none",
+                      padding: "0.4rem 0.8rem",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Elimina
+                  </button>
                 )}
               </div>
-
-              {user && media.userId && user.id === media.userId._id && (
-                <button
-                  onClick={() => handleDelete(media._id)}
-                  style={{
-                    marginTop: "1rem",
-                    backgroundColor: "crimson",
-                    color: "white",
-                    border: "none",
-                    padding: "0.4rem 0.8rem",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  🗑️ Elimina
-                </button>
-              )}
             </div>
           ))}
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function UploadMedia({ onNotify, theme }) {
+function UploadMedia({ onNotify, theme, onUploadSuccess }) {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
@@ -48,6 +48,12 @@ function UploadMedia({ onNotify, theme }) {
         setFile(null);
         setPreviewUrl(null);
         onNotify && onNotify("✅ Media caricato con successo!", "success");
+
+        // 🔁 Naviga alla galleria dopo il successo
+        if (onUploadSuccess) {
+          onUploadSuccess();
+        }
+
       } else {
         setMessage(`❌ Errore: ${data.message}`);
         onNotify && onNotify(`❌ Errore: ${data.message}`, "error");
@@ -190,3 +196,4 @@ function UploadMedia({ onNotify, theme }) {
 }
 
 export default UploadMedia;
+

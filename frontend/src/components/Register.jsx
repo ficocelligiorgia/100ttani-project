@@ -23,17 +23,17 @@ function Register({ onRegisterSuccess }) {
 
 
       } else {
-        setMessage(`❌ ${data.message}`);
+        setMessage(` ${data.message}`);
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Errore durante la registrazione.");
+      setMessage(" Errore durante la registrazione.");
     }
   };
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h2>📝 Registrazione</h2>
+      <h2> Registrazione</h2>
 
       <form onSubmit={handleRegister}>
         <input

@@ -6,7 +6,6 @@ import Gallery from "./components/Gallery";
 import Notification from "./components/Notification";
 import Navbar from "./components/Navbar";
 
-// 👇 Temi
 const lightTheme = {
   background: "#ffffff",
   color: "#222",
@@ -34,6 +33,7 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [isDark, setIsDark] = useState(false);
+  const [activeSection, setActiveSection] = useState("gallery");
 
   const themeStyles = isDark ? darkTheme : lightTheme;
 
@@ -46,7 +46,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setToken(null);
-    showNotification("🔒 Logout effettuato", "info");
+    showNotification("🔓 Logout effettuato", "info");
   };
 
   const showNotification = (message, type = "info") => {
@@ -56,7 +56,6 @@ function App() {
 
   const toggleTheme = () => setIsDark((prev) => !prev);
 
-  // Applica il tema al body
   useEffect(() => {
     document.body.style.backgroundColor = themeStyles.background;
     document.body.style.color = themeStyles.color;
@@ -70,10 +69,10 @@ function App() {
         onToggleAuth={() => setShowLogin(!showLogin)}
         isDark={isDark}
         onToggleTheme={toggleTheme}
+        onNavigate={setActiveSection}
       />
 
-        <div style={{ padding: "2rem" }}>
-
+      <div style={{ padding: "2rem" }}>
         <Notification message={notification.message} type={notification.type} />
 
         {!token ? (
@@ -101,8 +100,20 @@ function App() {
           </>
         ) : (
           <>
-            <UploadMedia onNotify={showNotification} theme={themeStyles} />
-            <Gallery onNotify={showNotification} theme={themeStyles} />
+            {activeSection === "upload" && (
+              <UploadMedia
+                onNotify={showNotification}
+                theme={themeStyles}
+                onUploadSuccess={() => setActiveSection("gallery")} // ✅ Redireziona alla galleria
+              />
+            )}
+            {activeSection === "gallery" && (
+              <Gallery
+                onNotify={showNotification}
+                theme={themeStyles}
+                onAddPostClick={() => setActiveSection("upload")}
+              />
+            )}
           </>
         )}
       </div>
