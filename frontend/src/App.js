@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect } from "react";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -14,7 +15,7 @@ const lightTheme = {
   inputText: "#000",
   borderColor: "#ccc",
   cardBackground: "#fdfdfd",
-  buttonBackground: "#007bff",
+  buttonBackground: "#c10000",
   buttonColor: "#fff",
 };
 
@@ -25,7 +26,7 @@ const darkTheme = {
   inputText: "#fff",
   borderColor: "#444",
   cardBackground: "#1a1a1a",
-  buttonBackground: "#333",
+  buttonBackground: "#c10000",
   buttonColor: "#fff",
 };
 
@@ -35,6 +36,7 @@ function App() {
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [isDark, setIsDark] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [isMuted, setIsMuted] = useState(false); // 👈 stato audio condiviso
 
   const themeStyles = isDark ? darkTheme : lightTheme;
 
@@ -78,63 +80,56 @@ function App() {
         onNavigate={setActiveSection}
       />
 
-      <div style={{ padding: "0", minHeight: "100vh" }}>
-        <Notification message={notification.message} type={notification.type} />
+      <Notification message={notification.message} type={notification.type} />
 
-        {activeSection === "home" && (
-          <Home
-            theme={themeStyles}
-            isDark={isDark}
-            isLoggedIn={!!token}
-            onNavigate={setActiveSection}
-            onShowLogin={() => {
-              setShowLogin(true);
-              setActiveSection("auth");
-            }}
+      {activeSection === "home" && (
+        <Home
+          theme={themeStyles}
+          isDark={isDark}
+          isMuted={isMuted}
+          setIsMuted={setIsMuted}
+          isLoggedIn={!!token}
+          onNavigate={setActiveSection}
+          onShowLogin={() => {
+            setShowLogin(true);
+            setActiveSection("auth");
+          }}
+        />
+      )}
+
+      {!token && activeSection === "auth" && (
+        showLogin ? (
+          <Login
+            isMuted={isMuted}
+            setIsMuted={setIsMuted}
+            onLoginSuccess={handleLoginSuccess}
+            onSwitchToRegister={() => setShowLogin(false)}
           />
-        )}
-
-        {activeSection === "auth" && !token && (
-          <>
-            {showLogin ? (
-              <Login onLoginSuccess={handleLoginSuccess} />
-            ) : (
-              <Register onRegisterSuccess={handleLoginSuccess} />
-            )}
-            <p style={{ marginTop: "1rem" }}>
-              {showLogin ? "Non hai un account?" : "Hai già un account?"}{" "}
-              <button
-                onClick={() => setShowLogin(!showLogin)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: themeStyles.buttonBackground,
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                }}
-              >
-                {showLogin ? "Registrati qui" : "Accedi qui"}
-              </button>
-            </p>
-          </>
-        )}
-
-        {activeSection === "upload" && token && (
-          <UploadMedia
-            onNotify={showNotification}
-            theme={themeStyles}
-            onUploadSuccess={() => setActiveSection("gallery")}
+        ) : (
+          <Register
+            isMuted={isMuted}
+            setIsMuted={setIsMuted}
+            onRegisterSuccess={handleLoginSuccess}
+            onSwitchToLogin={() => setShowLogin(true)}
           />
-        )}
+        )
+      )}
 
-        {activeSection === "gallery" && token && (
-          <Gallery
-            onNotify={showNotification}
-            theme={themeStyles}
-            onAddPostClick={() => setActiveSection("upload")}
-          />
-        )}
-      </div>
+      {token && activeSection === "upload" && (
+        <UploadMedia
+          onNotify={showNotification}
+          theme={themeStyles}
+          onUploadSuccess={() => setActiveSection("gallery")}
+        />
+      )}
+
+      {token && activeSection === "gallery" && (
+        <Gallery
+          onNotify={showNotification}
+          theme={themeStyles}
+          onAddPostClick={() => setActiveSection("upload")}
+        />
+      )}
     </>
   );
 }

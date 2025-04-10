@@ -7,7 +7,7 @@ function Home({ theme, isLoggedIn, onNavigate, onShowLogin }) {
 
   return (
     <div style={{ position: "relative", height: "100vh", overflow: "hidden" }}>
-      {/* Sfondo video */}
+      
       <video
         autoPlay
         loop
@@ -27,7 +27,7 @@ function Home({ theme, isLoggedIn, onNavigate, onShowLogin }) {
         Il tuo browser non supporta i video HTML5.
       </video>
 
-      {/* Pulsante mute/unmute */}
+      
       <button
         onClick={() => setIsMuted(!isMuted)}
         style={{
@@ -49,7 +49,7 @@ function Home({ theme, isLoggedIn, onNavigate, onShowLogin }) {
         {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
       </button>
 
-      {/* Contenuto centrale */}
+      
       <div
         style={{
           zIndex: 1,
