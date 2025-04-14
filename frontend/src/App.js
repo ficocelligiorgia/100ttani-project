@@ -1,5 +1,5 @@
-// App.js
 import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UploadMedia from "./components/UploadMedia";
@@ -7,6 +7,8 @@ import Gallery from "./components/Gallery";
 import Notification from "./components/Notification";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
+import Shop from "./components/Shop";
+import ProductDetail from "./components/ProductDetail";
 
 const lightTheme = {
   background: "#ffffff",
@@ -35,23 +37,24 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [isDark, setIsDark] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
-  const [isMuted, setIsMuted] = useState(false); // 👈 stato audio condiviso
+  const [isMuted, setIsMuted] = useState(false);
 
   const themeStyles = isDark ? darkTheme : lightTheme;
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLoginSuccess = (receivedToken) => {
     localStorage.setItem("token", receivedToken);
     setToken(receivedToken);
     showNotification("✅ Login effettuato!", "success");
-    setActiveSection("home");
+    navigate("/"); // torna alla home
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setToken(null);
     showNotification("🔓 Logout effettuato", "info");
-    setActiveSection("home");
+    navigate("/");
   };
 
   const showNotification = (message, type = "info") => {
@@ -72,64 +75,87 @@ function App() {
         isLoggedIn={!!token}
         onLogout={handleLogout}
         onToggleAuth={() => {
-          setActiveSection("auth");
           setShowLogin(true);
+          navigate("/auth");
         }}
         isDark={isDark}
         onToggleTheme={toggleTheme}
-        onNavigate={setActiveSection}
+        onNavigate={navigate}
       />
 
       <Notification message={notification.message} type={notification.type} />
 
-      {activeSection === "home" && (
-        <Home
-          theme={themeStyles}
-          isDark={isDark}
-          isMuted={isMuted}
-          setIsMuted={setIsMuted}
-          isLoggedIn={!!token}
-          onNavigate={setActiveSection}
-          onShowLogin={() => {
-            setShowLogin(true);
-            setActiveSection("auth");
-          }}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Home
+              theme={themeStyles}
+              isDark={isDark}
+              isMuted={isMuted}
+              setIsMuted={setIsMuted}
+              isLoggedIn={!!token}
+              onNavigate={navigate}
+              onShowLogin={() => {
+                setShowLogin(true);
+                navigate("/auth");
+              }}
+            />
+          }
         />
-      )}
 
-      {!token && activeSection === "auth" && (
-        showLogin ? (
-          <Login
-            isMuted={isMuted}
-            setIsMuted={setIsMuted}
-            onLoginSuccess={handleLoginSuccess}
-            onSwitchToRegister={() => setShowLogin(false)}
-          />
-        ) : (
-          <Register
-            isMuted={isMuted}
-            setIsMuted={setIsMuted}
-            onRegisterSuccess={handleLoginSuccess}
-            onSwitchToLogin={() => setShowLogin(true)}
-          />
-        )
-      )}
-
-      {token && activeSection === "upload" && (
-        <UploadMedia
-          onNotify={showNotification}
-          theme={themeStyles}
-          onUploadSuccess={() => setActiveSection("gallery")}
+        <Route
+          path="/auth"
+          element={
+            !token ? (
+              showLogin ? (
+                <Login
+                  isMuted={isMuted}
+                  setIsMuted={setIsMuted}
+                  onLoginSuccess={handleLoginSuccess}
+                  onSwitchToRegister={() => setShowLogin(false)}
+                />
+              ) : (
+                <Register
+                  isMuted={isMuted}
+                  setIsMuted={setIsMuted}
+                  onRegisterSuccess={handleLoginSuccess}
+                  onSwitchToLogin={() => setShowLogin(true)}
+                />
+              )
+            ) : null
+          }
         />
-      )}
 
-      {token && activeSection === "gallery" && (
-        <Gallery
-          onNotify={showNotification}
-          theme={themeStyles}
-          onAddPostClick={() => setActiveSection("upload")}
+        <Route
+          path="/upload"
+          element={
+            token && (
+              <UploadMedia
+                onNotify={showNotification}
+                theme={themeStyles}
+                onUploadSuccess={() => navigate("/gallery")}
+              />
+            )
+          }
         />
-      )}
+
+        <Route
+          path="/gallery"
+          element={
+            token && (
+              <Gallery
+                onNotify={showNotification}
+                theme={themeStyles}
+                onAddPostClick={() => navigate("/upload")}
+              />
+            )
+          }
+        />
+
+        <Route path="/shop" element={<Shop theme={themeStyles} />} />
+        <Route path="/shop/:id" element={<ProductDetail theme={themeStyles} />} />
+      </Routes>
     </>
   );
 }
