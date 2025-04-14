@@ -20,7 +20,7 @@ function Navbar({ isLoggedIn, onLogout, onToggleAuth, isDark, onToggleTheme, onN
       <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
         {isLoggedIn && (
           <>
-            <NavLink label=" Home" onClick={() => onNavigate("home")} />
+            <NavLink label=" Home" onClick={() => onNavigate("/")} />
             <NavLink label=" Galleria" onClick={() => onNavigate("gallery")} />
             <NavLink label=" Profilo" onClick={() => onNavigate("profile")} />
             <NavLink label=" Eventi" onClick={() => onNavigate("events")} />
