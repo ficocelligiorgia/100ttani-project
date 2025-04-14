@@ -32,7 +32,7 @@ function Register({ onRegisterSuccess, onSwitchToLogin, isMuted, setIsMuted }) {
 
   return (
     <div style={{ position: "relative", height: "100vh", overflow: "hidden" }}>
-      {/* 🎬 Video di sfondo */}
+      {}
       <video
         autoPlay
         loop
@@ -51,7 +51,7 @@ function Register({ onRegisterSuccess, onSwitchToLogin, isMuted, setIsMuted }) {
         <source src="/videos/landing.mp4" type="video/mp4" />
       </video>
 
-      {/* 🔇 Pulsante audio */}
+      {}
       <button
         onClick={() => setIsMuted(!isMuted)}
         style={{

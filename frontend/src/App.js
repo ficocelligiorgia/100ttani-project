@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UploadMedia from "./components/UploadMedia";
@@ -10,6 +10,7 @@ import Home from "./components/Home";
 import Shop from "./components/Shop";
 import ProductDetail from "./components/ProductDetail";
 
+// 🎨 Temi
 const lightTheme = {
   background: "#ffffff",
   color: "#222",
@@ -35,24 +36,38 @@ const darkTheme = {
 function App() {
   const [showLogin, setShowLogin] = useState(true);
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [userRole, setUserRole] = useState("");
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [isDark, setIsDark] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  const themeStyles = isDark ? darkTheme : lightTheme;
   const navigate = useNavigate();
-  const location = useLocation();
+  const themeStyles = isDark ? darkTheme : lightTheme;
+
+  // 🔓 Decodifica token e estrai ruolo
+  const extractUserRole = (jwtToken) => {
+    try {
+      const payload = JSON.parse(atob(jwtToken.split(".")[1]));
+      console.log("🎫 Payload decodificato:", payload);
+      return payload.role || "";
+    } catch (err) {
+      console.error("❌ Errore nella decodifica del token", err);
+      return "";
+    }
+  };
 
   const handleLoginSuccess = (receivedToken) => {
     localStorage.setItem("token", receivedToken);
     setToken(receivedToken);
+    setUserRole(extractUserRole(receivedToken));
     showNotification("✅ Login effettuato!", "success");
-    navigate("/"); // torna alla home
+    navigate("/");
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setToken(null);
+    setUserRole("");
     showNotification("🔓 Logout effettuato", "info");
     navigate("/");
   };
@@ -64,10 +79,16 @@ function App() {
 
   const toggleTheme = () => setIsDark((prev) => !prev);
 
+  // 🌐 Quando cambia il tema o il token
   useEffect(() => {
     document.body.style.backgroundColor = themeStyles.background;
     document.body.style.color = themeStyles.color;
-  }, [themeStyles]);
+
+    if (token) {
+      const role = extractUserRole(token);
+      if (role !== userRole) setUserRole(role); // Evita inutili set
+    }
+  }, [themeStyles, token]);
 
   return (
     <>
@@ -153,7 +174,18 @@ function App() {
           }
         />
 
-        <Route path="/shop" element={<Shop theme={themeStyles} />} />
+        <Route
+          path="/shop"
+          element={
+            <Shop
+              theme={themeStyles}
+              token={token}
+              userRole={userRole}
+              onNotify={showNotification}
+            />
+          }
+        />
+
         <Route path="/shop/:id" element={<ProductDetail theme={themeStyles} />} />
       </Routes>
     </>

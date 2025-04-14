@@ -19,18 +19,25 @@ function Login({ onLoginSuccess, onSwitchToRegister, isMuted, setIsMuted }) {
       const data = await res.json();
 
       if (res.ok) {
-        onLoginSuccess(data.token);
+        localStorage.setItem("token", data.token);
+
+        // 👇 Decodifica il token per controllare ruolo (opzionale)
+        const payload = JSON.parse(atob(data.token.split(".")[1]));
+        console.log("Token decodificato:", payload);
+
+        onLoginSuccess(data.token); // Passa il token al parent
       } else {
         setMessage(data.message || "Credenziali non valide.");
       }
     } catch (err) {
+      console.error(err);
       setMessage("Errore di connessione.");
     }
   };
 
   return (
     <div style={{ position: "relative", height: "100vh", overflow: "hidden" }}>
-      {/* 🎬 Video di sfondo */}
+      {/* 🎥 Video sfondo */}
       <video
         autoPlay
         loop
@@ -49,7 +56,7 @@ function Login({ onLoginSuccess, onSwitchToRegister, isMuted, setIsMuted }) {
         <source src="/videos/landing.mp4" type="video/mp4" />
       </video>
 
-      {/* 🔇 Pulsante mute/unmute */}
+      {/* 🔇 Mute/Unmute */}
       <button
         onClick={() => setIsMuted(!isMuted)}
         style={{

@@ -1,3 +1,4 @@
+// src/components/ProductCard.jsx
 import React from "react";
 
 function ProductCard({ product, onSelect }) {
@@ -5,21 +6,22 @@ function ProductCard({ product, onSelect }) {
     <div
       onClick={() => onSelect(product)}
       style={{
-        border: "1px solid #ddd",
+        cursor: "pointer",
+        border: "1px solid #ccc",
         borderRadius: "8px",
         padding: "1rem",
-        textAlign: "center",
-        cursor: "pointer",
-        background: "#fff",
+        backgroundColor: "#fff",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        transition: "transform 0.2s",
       }}
     >
       <img
-        src={product.image}
+        src={product.imageUrl}
         alt={product.name}
-        style={{ width: "100%", height: "180px", objectFit: "cover" }}
+        style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "6px" }}
       />
-      <h3>{product.name}</h3>
-      <p>{product.price} €</p>
+      <h3 style={{ margin: "0.8rem 0" }}>{product.name}</h3>
+      <p style={{ color: "crimson", fontWeight: "bold" }}>{product.price.toFixed(2)} €</p>
     </div>
   );
 }
