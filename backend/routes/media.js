@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const Media = require("../models/media");
-const verifyToken = require("../middleware/auth");
+const { verifyToken } = require("../middleware/auth");
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
