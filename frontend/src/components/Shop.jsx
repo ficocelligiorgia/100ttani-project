@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import ProductCard from "./ProductCard";
 import ProductDetail from "./ProductDetail";
@@ -11,12 +11,7 @@ function Shop({ theme, token, userRole, onNotify }) {
 
   const isAdmin = userRole === "admin" || userRole === "staff";
 
-  // ✅ Log di debug del ruolo
-  useEffect(() => {
-    console.log(" Ruolo utente ricevuto in Shop:", userRole);
-  }, [userRole]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const res = await axios.get("http://localhost:5000/products");
       setProducts(res.data);
@@ -24,17 +19,32 @@ function Shop({ theme, token, userRole, onNotify }) {
       console.error("Errore nel recupero prodotti", err);
       onNotify?.("Errore nel recupero prodotti", "error");
     }
+  }, [onNotify]);
+
+  const handleDeleteProduct = async (productId) => {
+    try {
+      await axios.delete(`http://localhost:5000/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setProducts((prev) => prev.filter((p) => p._id !== productId));
+      onNotify?.("✅ Prodotto eliminato", "success");
+    } catch (err) {
+      console.error("Errore nella cancellazione del prodotto:", err);
+      onNotify?.("❌ Errore durante l'eliminazione", "error");
+    }
   };
 
   useEffect(() => {
     fetchProducts();
-  }, [token]); // refetch prodotti se cambia token (es. nuovo login)
+  }, [fetchProducts]);
 
   return (
     <div style={{ padding: "2rem", position: "relative" }}>
       <h1 style={{ color: theme.color }}>Shop</h1>
 
-      {/* Admin Product Form */}
       {isAdmin && showForm && (
         <div style={{ marginBottom: "2rem" }}>
           <AdminProductForm
@@ -49,7 +59,6 @@ function Shop({ theme, token, userRole, onNotify }) {
         </div>
       )}
 
-      {/* Product Cards */}
       <div
         style={{
           display: "grid",
@@ -57,16 +66,21 @@ function Shop({ theme, token, userRole, onNotify }) {
           gap: "1.5rem",
         }}
       >
-        {products.map((product) => (
-          <ProductCard
-            key={product._id}
-            product={product}
-            onSelect={setSelectedProduct}
-          />
-        ))}
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard
+              key={product._id}
+              product={product}
+              onSelect={setSelectedProduct}
+              onDelete={handleDeleteProduct}
+              userRole={userRole}
+            />
+          ))
+        ) : (
+          <p style={{ textAlign: "center" }}>Nessun prodotto disponibile.</p>
+        )}
       </div>
 
-      {/* Product Detail Modal */}
       {selectedProduct && (
         <ProductDetail
           product={selectedProduct}
@@ -74,7 +88,6 @@ function Shop({ theme, token, userRole, onNotify }) {
         />
       )}
 
-      {/* Floating "+" Button */}
       {isAdmin && (
         <button
           onClick={() => setShowForm(!showForm)}
