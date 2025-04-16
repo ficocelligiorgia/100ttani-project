@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/post");
-const { verifyToken } = require("../middleware/auth"); 
+const { verifyToken } = require("../middleware/auth");
 const multer = require("multer");
 const path = require("path");
 
+// 📦 Multer config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
@@ -17,6 +18,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// 📤 Crea un nuovo post
 router.post("/", verifyToken, upload.single("media"), async (req, res) => {
   const { content } = req.body;
 
@@ -40,4 +42,16 @@ router.post("/", verifyToken, upload.single("media"), async (req, res) => {
   }
 });
 
+// 🧾 Recupera solo i post personali dell'utente loggato
+router.get("/mine", verifyToken, async (req, res) => {
+  try {
+    const myPosts = await Post.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json(myPosts);
+  } catch (err) {
+    console.error("Errore GET /posts/mine:", err);
+    res.status(500).json({ message: "Errore nel recupero dei post personali." });
+  }
+});
+
 module.exports = router;
+

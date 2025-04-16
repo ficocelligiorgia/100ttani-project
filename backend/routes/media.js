@@ -4,7 +4,6 @@ const multer = require("multer");
 const Media = require("../models/media");
 const { verifyToken } = require("../middleware/auth");
 
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
@@ -12,6 +11,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// 🔹 Crea nuovo media
 router.post("/", verifyToken, upload.single("file"), async (req, res) => {
   try {
     const newMedia = new Media({
@@ -29,12 +29,14 @@ router.post("/", verifyToken, upload.single("file"), async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+// 🔹 Recupera media globali o personali con ?mine=true
+router.get("/", verifyToken, async (req, res) => {
   try {
-    const media = await Media.find()
+    const filter = req.query.mine === "true" ? { userId: req.user.id } : {};
+    const media = await Media.find(filter)
       .sort({ createdAt: -1 })
-      .populate("userId", "username email") 
-      .populate("comments.user", "username email"); 
+      .populate("userId", "username email")
+      .populate("comments.user", "username email");
 
     res.json(media);
   } catch (err) {
@@ -42,7 +44,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-
+// 🔹 Like / Unlike
 router.post("/:id/like", verifyToken, async (req, res) => {
   const media = await Media.findById(req.params.id);
   if (!media) return res.status(404).json({ message: "Media non trovato" });
@@ -59,6 +61,7 @@ router.post("/:id/like", verifyToken, async (req, res) => {
   res.json({ liked: !alreadyLiked, totalLikes: media.likes.length });
 });
 
+// 🔹 Commento
 router.post("/:id/comment", verifyToken, async (req, res) => {
   const { text } = req.body;
   const mediaId = req.params.id;
@@ -82,12 +85,10 @@ router.post("/:id/comment", verifyToken, async (req, res) => {
   }
 });
 
-
-
+// 🔹 Elimina media
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const media = await Media.findById(req.params.id);
-
     if (!media) {
       return res.status(404).json({ message: "Media non trovato" });
     }
@@ -103,6 +104,5 @@ router.delete("/:id", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Errore del server" });
   }
 });
-
 
 module.exports = router;

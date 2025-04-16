@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import Shop from "./components/Shop";
 import ProductDetail from "./components/ProductDetail";
+import Profile from "./components/Profile"; // ✅ IMPORT PROFILO
 
 // 🎨 Temi
 const lightTheme = {
@@ -44,11 +45,9 @@ function App() {
   const navigate = useNavigate();
   const themeStyles = isDark ? darkTheme : lightTheme;
 
-  // 🔓 Decodifica token e estrai ruolo
   const extractUserRole = (jwtToken) => {
     try {
       const payload = JSON.parse(atob(jwtToken.split(".")[1]));
-      console.log("🎫 Payload decodificato:", payload);
       return payload.role || "";
     } catch (err) {
       console.error("❌ Errore nella decodifica del token", err);
@@ -79,14 +78,13 @@ function App() {
 
   const toggleTheme = () => setIsDark((prev) => !prev);
 
-  // 🌐 Quando cambia il tema o il token
   useEffect(() => {
     document.body.style.backgroundColor = themeStyles.background;
     document.body.style.color = themeStyles.color;
 
     if (token) {
       const role = extractUserRole(token);
-      if (role !== userRole) setUserRole(role); // Evita inutili set
+      if (role !== userRole) setUserRole(role);
     }
   }, [themeStyles, token]);
 
@@ -187,6 +185,23 @@ function App() {
         />
 
         <Route path="/shop/:id" element={<ProductDetail theme={themeStyles} />} />
+
+        {/* ✅ Route PROFILO */}
+        <Route
+          path="/profile"
+          element={
+            token ? (
+              <Profile onNotify={showNotification} theme={themeStyles} />
+            ) : (
+              <Login
+                onLoginSuccess={handleLoginSuccess}
+                isMuted={isMuted}
+                setIsMuted={setIsMuted}
+                onSwitchToRegister={() => setShowLogin(false)}
+              />
+            )
+          }
+        />
       </Routes>
     </>
   );
