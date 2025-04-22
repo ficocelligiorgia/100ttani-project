@@ -5,6 +5,7 @@ import ProductDetail from "./ProductDetail";
 import AdminProductForm from "./AdminProductForm";
 import CartDrawer from "./CartDrawer";
 import { FiShoppingCart } from "react-icons/fi";
+import CheckoutPage from "./CheckoutPage"; // ✅ Importato il componente Checkout
 
 function Shop({ theme, token, userRole, onNotify }) {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,7 @@ function Shop({ theme, token, userRole, onNotify }) {
   const [showForm, setShowForm] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [checkoutOpen, setCheckoutOpen] = useState(false); // ✅ Stato per il checkout
 
   const isAdmin = userRole === "admin" || userRole === "staff";
 
@@ -86,8 +88,18 @@ function Shop({ theme, token, userRole, onNotify }) {
   };
 
   const handleCheckout = () => {
-    console.log("🛒 Checkout con:", cartItems);
-    onNotify?.("🚧 Funzione checkout in costruzione", "info");
+    if (!token) {
+      onNotify?.("Devi essere loggato per completare l'acquisto", "warning");
+      return;
+    }
+    setCartOpen(false);
+    setCheckoutOpen(true);
+  };
+
+  const handleOrderComplete = () => {
+    setCartItems([]);
+    setCheckoutOpen(false);
+    onNotify?.("✅ Ordine completato!", "success");
   };
 
   useEffect(() => {
@@ -167,7 +179,6 @@ function Shop({ theme, token, userRole, onNotify }) {
         )}
       </div>
 
-      {/* ✅ Modale dettaglio con supporto theme */}
       {selectedProduct && (
         <ProductDetail
           product={selectedProduct}
@@ -177,7 +188,6 @@ function Shop({ theme, token, userRole, onNotify }) {
         />
       )}
 
-      {/* ✅ Pulsante per aggiungere nuovi prodotti (admin) */}
       {isAdmin && (
         <button
           onClick={() => setShowForm(!showForm)}
@@ -202,16 +212,27 @@ function Shop({ theme, token, userRole, onNotify }) {
         </button>
       )}
 
-      {/* 🛒 Carrello laterale */}
-      <CartDrawer
-        isOpen={cartOpen}
-        onClose={() => setCartOpen(false)}
-        cartItems={cartItems}
-        onQuantityChange={handleQuantityChange}
-        onRemoveItem={handleRemoveItem}
-        onCheckout={handleCheckout}
-        theme={theme}
-      />
+      {!checkoutOpen && (
+        <CartDrawer
+          isOpen={cartOpen}
+          onClose={() => setCartOpen(false)}
+          cartItems={cartItems}
+          onQuantityChange={handleQuantityChange}
+          onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+          theme={theme}
+          isAuthenticated={!!token}
+        />
+      )}
+
+      {checkoutOpen && (
+        <CheckoutPage
+          cartItems={cartItems}
+          onBack={() => setCheckoutOpen(false)}
+          onComplete={handleOrderComplete}
+          theme={theme}
+        />
+      )}
     </div>
   );
 }
