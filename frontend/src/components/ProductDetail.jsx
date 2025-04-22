@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-function ProductDetail({ product, onClose, onAddToCart }) {
+function ProductDetail({ product, onClose, onAddToCart, theme }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const baseUrl = "http://localhost:5000";
 
@@ -38,12 +38,14 @@ function ProductDetail({ product, onClose, onAddToCart }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: theme.cardBackground,
+          color: theme.color,
           padding: "2rem",
           borderRadius: "10px",
           width: "90%",
           maxWidth: "600px",
           position: "relative",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
         }}
       >
         <button
@@ -55,7 +57,7 @@ function ProductDetail({ product, onClose, onAddToCart }) {
             fontSize: "1.5rem",
             background: "none",
             border: "none",
-            color: "#000",
+            color: theme.color,
             cursor: "pointer",
           }}
         >
@@ -123,15 +125,14 @@ function ProductDetail({ product, onClose, onAddToCart }) {
         <p style={{ fontWeight: "bold" }}>{parseFloat(product.price).toFixed(2)} €</p>
         {product.specs && <p style={{ fontStyle: "italic" }}>{product.specs}</p>}
 
-        {/* ✅ Bottone Aggiungi al carrello */}
         <button
           onClick={() => onAddToCart?.(product)}
           style={{
             marginTop: "1rem",
             width: "100%",
             padding: "0.75rem",
-            backgroundColor: "crimson",
-            color: "#fff",
+            backgroundColor: theme.buttonBackground,
+            color: theme.buttonColor,
             border: "none",
             borderRadius: "8px",
             fontWeight: "bold",
@@ -147,4 +148,3 @@ function ProductDetail({ product, onClose, onAddToCart }) {
 }
 
 export default ProductDetail;
-

@@ -167,14 +167,17 @@ function Shop({ theme, token, userRole, onNotify }) {
         )}
       </div>
 
+      {/* ✅ Modale dettaglio con supporto theme */}
       {selectedProduct && (
         <ProductDetail
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onAddToCart={handleAddToCart} // ✅ AGGIUNTO per supportare il bottone anche nella modale
+          onAddToCart={handleAddToCart}
+          theme={theme}
         />
       )}
 
+      {/* ✅ Pulsante per aggiungere nuovi prodotti (admin) */}
       {isAdmin && (
         <button
           onClick={() => setShowForm(!showForm)}
@@ -199,7 +202,7 @@ function Shop({ theme, token, userRole, onNotify }) {
         </button>
       )}
 
-      {/* 🛒 Drawer carrello */}
+      {/* 🛒 Carrello laterale */}
       <CartDrawer
         isOpen={cartOpen}
         onClose={() => setCartOpen(false)}

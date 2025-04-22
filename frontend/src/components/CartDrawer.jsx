@@ -23,12 +23,11 @@ const CartDrawer = ({
         boxShadow: "-2px 0 10px rgba(0,0,0,0.3)",
         transition: "right 0.3s ease-in-out",
         zIndex: 999,
-        padding: "1rem",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div style={{ padding: "1rem", display: "flex", justifyContent: "space-between" }}>
         <h2 style={{ margin: 0 }}>🛒 Carrello</h2>
         <button
           onClick={onClose}
@@ -45,7 +44,7 @@ const CartDrawer = ({
         </button>
       </div>
 
-      <div style={{ flex: 1, overflowY: "auto", marginTop: "1rem" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "0 1rem" }}>
         {cartItems.length === 0 ? (
           <p>Il carrello è vuoto.</p>
         ) : (
@@ -63,13 +62,22 @@ const CartDrawer = ({
               <img
                 src={item.image}
                 alt={item.name}
-                style={{ width: "60px", height: "60px", objectFit: "cover", marginRight: "1rem", borderRadius: "6px" }}
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  objectFit: "cover",
+                  marginRight: "1rem",
+                  borderRadius: "6px",
+                }}
               />
               <div style={{ flex: 1 }}>
                 <strong>{item.name}</strong>
                 <p style={{ margin: "0.3rem 0" }}>{parseFloat(item.price).toFixed(2)} €</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <button onClick={() => onQuantityChange(item.productId, item.quantity - 1)} disabled={item.quantity <= 1}>
+                  <button
+                    onClick={() => onQuantityChange(item.productId, item.quantity - 1)}
+                    disabled={item.quantity <= 1}
+                  >
                     -
                   </button>
                   <span>{item.quantity}</span>
@@ -95,22 +103,36 @@ const CartDrawer = ({
         )}
       </div>
 
+      {/* ✅ Bottone con posizione sticky */}
       {cartItems.length > 0 && (
-        <button
-          onClick={onCheckout}
+        <div
           style={{
-            marginTop: "auto",
-            padding: "0.75rem",
-            backgroundColor: "crimson",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "bold",
+            position: "sticky",
+            bottom: 0,
+            backgroundColor: theme.cardBackground,
+            padding: "1rem",
+            borderTop: `1px solid ${theme.borderColor}`,
+            textAlign: "center",
           }}
         >
-          Procedi all'acquisto
-        </button>
+          <button
+            onClick={onCheckout}
+            style={{
+              width: "100%",
+              maxWidth: "300px",
+              padding: "0.75rem 1rem",
+              backgroundColor: "crimson",
+              color: "#fff",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              fontSize: "1rem",
+            }}
+          >
+            Procedi all'acquisto
+          </button>
+        </div>
       )}
     </div>
   );
