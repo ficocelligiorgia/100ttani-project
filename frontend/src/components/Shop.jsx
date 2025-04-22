@@ -3,11 +3,15 @@ import axios from "axios";
 import ProductCard from "./ProductCard";
 import ProductDetail from "./ProductDetail";
 import AdminProductForm from "./AdminProductForm";
+import CartDrawer from "./CartDrawer";
+import { FiShoppingCart } from "react-icons/fi";
 
 function Shop({ theme, token, userRole, onNotify }) {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
 
   const isAdmin = userRole === "admin" || userRole === "staff";
 
@@ -37,13 +41,91 @@ function Shop({ theme, token, userRole, onNotify }) {
     }
   };
 
+  const handleAddToCart = (product) => {
+    setCartItems((prevItems) => {
+      const exists = prevItems.find((item) => item.productId === product._id);
+      if (exists) {
+        return prevItems.map((item) =>
+          item.productId === product._id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [
+          ...prevItems,
+          {
+            productId: product._id,
+            name: product.name,
+            price: product.price,
+            quantity: 1,
+            image: product.images?.[0]
+              ? product.images[0].startsWith("http")
+                ? product.images[0]
+                : `http://localhost:5000${product.images[0]}`
+              : "/images/placeholder.jpg",
+          },
+        ];
+      }
+    });
+    setCartOpen(true);
+  };
+
+  const handleQuantityChange = (productId, quantity) => {
+    if (quantity < 1) return;
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.productId === productId ? { ...item, quantity } : item
+      )
+    );
+  };
+
+  const handleRemoveItem = (productId) => {
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.productId !== productId)
+    );
+  };
+
+  const handleCheckout = () => {
+    console.log("🛒 Checkout con:", cartItems);
+    onNotify?.("🚧 Funzione checkout in costruzione", "info");
+  };
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
   return (
     <div style={{ padding: "2rem", position: "relative" }}>
-      <h1 style={{ color: theme.color }}>Shop</h1>
+      {/* 🛍️ Titolo + bottone carrello */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1 style={{ color: theme.color }}>Shop</h1>
+        <button
+          onClick={() => setCartOpen(true)}
+          title="Apri carrello"
+          style={{
+            backgroundColor: "crimson",
+            color: "#fff",
+            border: "none",
+            borderRadius: "50%",
+            width: "50px",
+            height: "50px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: "1.4rem",
+            cursor: "pointer",
+            zIndex: 999,
+          }}
+        >
+          <FiShoppingCart />
+        </button>
+      </div>
 
       {isAdmin && showForm && (
         <div style={{ marginBottom: "2rem" }}>
@@ -62,7 +144,7 @@ function Shop({ theme, token, userRole, onNotify }) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
           gap: "1.5rem",
         }}
       >
@@ -74,10 +156,14 @@ function Shop({ theme, token, userRole, onNotify }) {
               onSelect={setSelectedProduct}
               onDelete={handleDeleteProduct}
               userRole={userRole}
+              theme={theme}
+              onAddToCart={handleAddToCart}
             />
           ))
         ) : (
-          <p style={{ textAlign: "center" }}>Nessun prodotto disponibile.</p>
+          <p style={{ textAlign: "center", color: theme.color }}>
+            Nessun prodotto disponibile.
+          </p>
         )}
       </div>
 
@@ -85,6 +171,7 @@ function Shop({ theme, token, userRole, onNotify }) {
         <ProductDetail
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
+          onAddToCart={handleAddToCart} // ✅ AGGIUNTO per supportare il bottone anche nella modale
         />
       )}
 
@@ -111,6 +198,17 @@ function Shop({ theme, token, userRole, onNotify }) {
           +
         </button>
       )}
+
+      {/* 🛒 Drawer carrello */}
+      <CartDrawer
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+        cartItems={cartItems}
+        onQuantityChange={handleQuantityChange}
+        onRemoveItem={handleRemoveItem}
+        onCheckout={handleCheckout}
+        theme={theme}
+      />
     </div>
   );
 }

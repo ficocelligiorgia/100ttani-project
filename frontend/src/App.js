@@ -9,9 +9,9 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import Shop from "./components/Shop";
 import ProductDetail from "./components/ProductDetail";
-import Profile from "./components/Profile"; // ✅ IMPORT PROFILO
+import Profile from "./components/Profile"; 
 
-// 🎨 Temi
+
 const lightTheme = {
   background: "#ffffff",
   color: "#222",
@@ -186,7 +186,7 @@ function App() {
 
         <Route path="/shop/:id" element={<ProductDetail theme={themeStyles} />} />
 
-        {/* ✅ Route PROFILO */}
+        
         <Route
           path="/profile"
           element={

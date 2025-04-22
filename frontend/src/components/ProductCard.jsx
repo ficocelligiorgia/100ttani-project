@@ -1,31 +1,27 @@
 import React from "react";
 
-function ProductCard({ product, onSelect, onDelete, userRole }) {
+function ProductCard({ product, onSelect, onDelete, onAddToCart, userRole, theme }) {
   const isAdmin = userRole === "admin" || userRole === "staff";
   const baseUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-  // ✅ Gestione sicura anche se images è undefined o vuoto
   const imagePath = product?.images?.length > 0 ? product.images[0] : null;
 
-  // ✅ Composizione del path corretto per l'immagine
   const imageUrl = imagePath
     ? imagePath.startsWith("http")
       ? imagePath
       : `${baseUrl}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`
     : "/images/placeholder.jpg";
 
-  console.log("🧪 product image path:", imagePath);
-  console.log("🔗 imageUrl:", imageUrl);
-
   return (
     <div
       onClick={() => onSelect(product)}
       style={{
         cursor: "pointer",
-        border: "1px solid #ccc",
+        border: `1px solid ${theme.borderColor}`,
         borderRadius: "8px",
         padding: "1rem",
-        backgroundColor: "#fff",
+        backgroundColor: theme.cardBackground,
+        color: theme.color,
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         position: "relative",
         width: "100%",
@@ -65,12 +61,40 @@ function ProductCard({ product, onSelect, onDelete, userRole }) {
         />
       </div>
 
-      <h3 style={{ margin: "0.5rem 0", fontSize: "1rem", textAlign: "center" }}>
+      <h3
+        style={{
+          margin: "0.5rem 0",
+          fontSize: "1rem",
+          textAlign: "center",
+          color: theme.color,
+        }}
+      >
         {product.name}
       </h3>
+
       <p style={{ color: "crimson", fontWeight: "bold" }}>
         {parseFloat(product.price).toFixed(2)} €
       </p>
+
+      {/* ✅ Bottone Aggiungi al carrello */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onAddToCart(product);
+        }}
+        style={{
+          marginTop: "0.5rem",
+          padding: "0.4rem 1rem",
+          backgroundColor: "crimson",
+          color: "#fff",
+          border: "none",
+          borderRadius: "6px",
+          fontSize: "0.9rem",
+          cursor: "pointer",
+        }}
+      >
+        Aggiungi al carrello
+      </button>
 
       {isAdmin && (
         <button
@@ -100,4 +124,3 @@ function ProductCard({ product, onSelect, onDelete, userRole }) {
 }
 
 export default ProductCard;
-

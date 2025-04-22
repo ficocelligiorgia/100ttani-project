@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-function ProductDetail({ product, onClose }) {
+function ProductDetail({ product, onClose, onAddToCart }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const baseUrl = "http://localhost:5000";
 
@@ -122,9 +122,29 @@ function ProductDetail({ product, onClose }) {
         <p>{product.description}</p>
         <p style={{ fontWeight: "bold" }}>{parseFloat(product.price).toFixed(2)} €</p>
         {product.specs && <p style={{ fontStyle: "italic" }}>{product.specs}</p>}
+
+        {/* ✅ Bottone Aggiungi al carrello */}
+        <button
+          onClick={() => onAddToCart?.(product)}
+          style={{
+            marginTop: "1rem",
+            width: "100%",
+            padding: "0.75rem",
+            backgroundColor: "crimson",
+            color: "#fff",
+            border: "none",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            fontSize: "1rem",
+            cursor: "pointer",
+          }}
+        >
+          Aggiungi al carrello
+        </button>
       </div>
     </div>
   );
 }
 
 export default ProductDetail;
+

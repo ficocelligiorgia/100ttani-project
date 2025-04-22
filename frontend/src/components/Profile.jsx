@@ -172,7 +172,7 @@ function Profile({ onNotify }) {
                 marginBottom: "2rem",
                 borderRadius: "10px",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                maxWidth: "600px",
+                maxWidth: "500px",
               }}
             >
               {m.fileType === "image" ? (
@@ -181,7 +181,7 @@ function Profile({ onNotify }) {
                   alt={m.title}
                   style={{
                     width: "100%",
-                    height: "350px",
+                    maxHeight: "500px",
                     objectFit: "cover",
                     borderRadius: "8px",
                   }}
@@ -202,9 +202,7 @@ function Profile({ onNotify }) {
                   type="text"
                   placeholder="Scrivi un commento..."
                   value={commentText[m._id] || ""}
-                  onChange={(e) =>
-                    setCommentText({ ...commentText, [m._id]: e.target.value })
-                  }
+                  onChange={(e) => setCommentText({ ...commentText, [m._id]: e.target.value })}
                   style={{ width: "100%", marginTop: "0.5rem" }}
                 />
                 <button onClick={() => handleComment(m._id)}>Invia</button>
@@ -331,4 +329,3 @@ function Profile({ onNotify }) {
 }
 
 export default Profile;
-
