@@ -1,18 +1,22 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaTimes, FaTrashAlt } from "react-icons/fa";
 import CheckoutPage from "./CheckoutPage";
+import { CartContext } from "./CartContext"; // importa il contesto
 
-const CartDrawer = ({
-  isOpen,
-  onClose,
-  cartItems,
-  onQuantityChange,
-  onRemoveItem,
-  onCheckout,
-  theme,
-  isAuthenticated,
-}) => {
+const CartDrawer = ({ isOpen, onClose, theme, isAuthenticated }) => {
   const [showCheckout, setShowCheckout] = useState(false);
+  const { cartItems, addToCart, removeFromCart } = useContext(CartContext); // usa il contesto
+
+  const handleQuantityChange = (productId, newQuantity) => {
+    const item = cartItems.find((i) => i._id === productId);
+    if (!item) return;
+    const diff = newQuantity - item.quantity;
+    if (diff > 0) {
+      addToCart(item);
+    } else if (diff < 0) {
+      removeFromCart(productId);
+    }
+  };
 
   const total = cartItems.reduce(
     (acc, item) => acc + item.quantity * item.price,
@@ -43,7 +47,7 @@ const CartDrawer = ({
           onBack={() => setShowCheckout(false)}
           onComplete={() => {
             setShowCheckout(false);
-            onCheckout();
+            onClose();
           }}
         />
       ) : (
@@ -71,7 +75,7 @@ const CartDrawer = ({
             ) : (
               cartItems.map((item) => (
                 <div
-                  key={item.productId}
+                  key={item._id}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -98,25 +102,21 @@ const CartDrawer = ({
                     </p>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                       <button
-                        onClick={() =>
-                          onQuantityChange(item.productId, item.quantity - 1)
-                        }
+                        onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
                         disabled={item.quantity <= 1}
                       >
                         -
                       </button>
                       <span>{item.quantity}</span>
                       <button
-                        onClick={() =>
-                          onQuantityChange(item.productId, item.quantity + 1)
-                        }
+                        onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
                       >
                         +
                       </button>
                     </div>
                   </div>
                   <button
-                    onClick={() => onRemoveItem(item.productId)}
+                    onClick={() => removeFromCart(item._id)}
                     style={{
                       marginLeft: "0.5rem",
                       backgroundColor: "transparent",

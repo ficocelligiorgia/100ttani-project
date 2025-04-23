@@ -35,6 +35,7 @@ mongoose
 // Modelli
 require("./models/user");
 require("./models/cart"); // ✅ AGGIUNTO per il carrello
+require("./models/Event")// ✅ AGGIUNTO per eventi
 
 // Rotte
 app.use("/register", require("./routes/register"));
@@ -44,6 +45,7 @@ app.use("/posts", require("./routes/posts"));
 app.use("/media", require("./routes/media"));
 app.use("/products", require("./routes/products"));
 app.use("/cart", require("./routes/cart")); // ✅ AGGIUNTO per il carrello
+app.use("/events", require("./routes/events")); // ✅ AGGIUNTO per eventi
 
 // ✅ ROTTA STRIPE CHECKOUT
 app.post("/create-checkout-session", async (req, res) => {
@@ -69,7 +71,6 @@ app.post("/create-checkout-session", async (req, res) => {
   // ✅ IMPORTANTE: restituisci sessionId
   res.json({ id: session.id });
 });
-
 
 // Route base
 app.get("/", (req, res) => {

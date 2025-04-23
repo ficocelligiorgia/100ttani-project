@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { FaUserCircle } from "react-icons/fa";
+import { CartContext } from "./CartContext";
+import CartDrawer from "./CartDrawer";
 
 function Profile({ onNotify, theme }) {
   const [user, setUser] = useState({});
   const [media, setMedia] = useState([]);
   const [showInfo, setShowInfo] = useState(false);
-  const [showCart, setShowCart] = useState(false);
   const [commentText, setCommentText] = useState({});
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
+  const [cartOpen, setCartOpen] = useState(false);
   const token = localStorage.getItem("token");
+
+  const { cartItems, addToCart, removeFromCart, updateQuantity } = useContext(CartContext);
 
   const fetchUser = async () => {
     try {
@@ -237,9 +241,15 @@ function Profile({ onNotify, theme }) {
           </div>
         )}
 
-        <button onClick={() => setShowCart(!showCart)} style={{ ...sideBtnStyle, marginTop: "1rem" }}>Carrello ▼</button>
-        {showCart && <p>Il tuo carrello è vuoto (per ora!).</p>}
+        <button onClick={() => setCartOpen(true)} style={{ ...sideBtnStyle, marginTop: "1rem" }}>🛒 Apri Carrello</button>
       </div>
+
+      <CartDrawer
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+        theme={theme}
+        isAuthenticated={!!token}
+      />
     </div>
   );
 }

@@ -5,15 +5,18 @@ import ProductDetail from "./ProductDetail";
 import AdminProductForm from "./AdminProductForm";
 import CartDrawer from "./CartDrawer";
 import { FiShoppingCart } from "react-icons/fi";
-import CheckoutPage from "./CheckoutPage"; // ✅ Importato il componente Checkout
+import CheckoutPage from "./CheckoutPage";
+import { useContext } from "react";
+import { CartContext } from "./CartContext";
 
 function Shop({ theme, token, userRole, onNotify }) {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
-  const [checkoutOpen, setCheckoutOpen] = useState(false); // ✅ Stato per il checkout
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+
+  const { cartItems, addToCart } = useContext(CartContext);
 
   const isAdmin = userRole === "admin" || userRole === "staff";
 
@@ -34,7 +37,6 @@ function Shop({ theme, token, userRole, onNotify }) {
           Authorization: `Bearer ${token}`,
         },
       });
-
       setProducts((prev) => prev.filter((p) => p._id !== productId));
       onNotify?.("✅ Prodotto eliminato", "success");
     } catch (err) {
@@ -44,60 +46,20 @@ function Shop({ theme, token, userRole, onNotify }) {
   };
 
   const handleAddToCart = (product) => {
-    setCartItems((prevItems) => {
-      const exists = prevItems.find((item) => item.productId === product._id);
-      if (exists) {
-        return prevItems.map((item) =>
-          item.productId === product._id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        return [
-          ...prevItems,
-          {
-            productId: product._id,
-            name: product.name,
-            price: product.price,
-            quantity: 1,
-            image: product.images?.[0]
-              ? product.images[0].startsWith("http")
-                ? product.images[0]
-                : `http://localhost:5000${product.images[0]}`
-              : "/images/placeholder.jpg",
-          },
-        ];
-      }
+    addToCart({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.images?.[0]
+        ? product.images[0].startsWith("http")
+          ? product.images[0]
+          : `http://localhost:5000${product.images[0]}`
+        : "/images/placeholder.jpg",
     });
     setCartOpen(true);
   };
 
-  const handleQuantityChange = (productId, quantity) => {
-    if (quantity < 1) return;
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.productId === productId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const handleRemoveItem = (productId) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.productId !== productId)
-    );
-  };
-
-  const handleCheckout = () => {
-    if (!token) {
-      onNotify?.("Devi essere loggato per completare l'acquisto", "warning");
-      return;
-    }
-    setCartOpen(false);
-    setCheckoutOpen(true);
-  };
-
   const handleOrderComplete = () => {
-    setCartItems([]);
     setCheckoutOpen(false);
     onNotify?.("✅ Ordine completato!", "success");
   };
@@ -108,7 +70,6 @@ function Shop({ theme, token, userRole, onNotify }) {
 
   return (
     <div style={{ padding: "2rem", position: "relative" }}>
-      {/* 🛍️ Titolo + bottone carrello */}
       <div
         style={{
           display: "flex",
@@ -216,10 +177,6 @@ function Shop({ theme, token, userRole, onNotify }) {
         <CartDrawer
           isOpen={cartOpen}
           onClose={() => setCartOpen(false)}
-          cartItems={cartItems}
-          onQuantityChange={handleQuantityChange}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
           theme={theme}
           isAuthenticated={!!token}
         />

@@ -12,6 +12,10 @@ import ProductDetail from "./components/ProductDetail";
 import Profile from "./components/Profile";
 import Success from "./components/Success";
 import Cancel from "./components/Cancel";
+import { CartProvider } from "./components/CartContext";
+import Events from "./components/Events";
+import "leaflet/dist/leaflet.css";
+
 
 const lightTheme = {
   background: "#ffffff",
@@ -90,7 +94,7 @@ function App() {
   }, [themeStyles, token]);
 
   return (
-    <>
+    <CartProvider>
       <Navbar
         isLoggedIn={!!token}
         onLogout={handleLogout}
@@ -206,7 +210,6 @@ function App() {
           }
         />
 
-        {/* ✅ Rotte Stripe */}
         <Route
           path="/success"
           element={<Success theme={themeStyles} />}
@@ -215,8 +218,13 @@ function App() {
           path="/cancel"
           element={<Cancel theme={themeStyles} />}
         />
+
+        <Route
+          path="/events"
+          element={<Events theme={themeStyles} />}
+        />
       </Routes>
-    </>
+    </CartProvider>
   );
 }
 
