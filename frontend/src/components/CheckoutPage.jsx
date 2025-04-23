@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+
+// 🔑 Inserisci la tua vera chiave pubblica qui
+const stripePromise = loadStripe("pk_test_51RH5DhPkBSJO0ZIST0mGasAEpCBzN8OJJA1QyZF0JKIwXyiEGihnGmvfs4wrpsyU77qeSun3X1BpOn1NXEd6WuEX00kuuca9Xr");
 
 // Temi completi
 const themes = {
@@ -31,13 +35,11 @@ function CheckoutPage({ cartItems, onBack, onComplete }) {
 
   const [theme, setTheme] = useState(themes.light);
 
-  // Legge il tema da localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     setTheme(savedTheme === "dark" ? themes.dark : themes.light);
   }, []);
 
-  // Applica colori a body e html
   useEffect(() => {
     document.body.style.backgroundColor = theme.background;
     document.body.style.color = theme.text;
@@ -56,10 +58,29 @@ function CheckoutPage({ cartItems, onBack, onComplete }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("✅ Ordine completato:", { ...formData, cartItems });
-    onComplete?.();
+
+    // ✅ Salva il carrello per Success.jsx
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+    try {
+      const response = await fetch("http://localhost:5000/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItems }),
+      });
+
+      const data = await response.json();
+
+      const stripe = await stripePromise;
+
+      // ✅ Redirect corretto con sessionId
+      await stripe.redirectToCheckout({ sessionId: data.id });
+    } catch (error) {
+      console.error("❌ Errore durante il pagamento:", error);
+      alert("Errore nel processo di pagamento. Riprova.");
+    }
   };
 
   const total = cartItems.reduce(
@@ -94,7 +115,6 @@ function CheckoutPage({ cartItems, onBack, onComplete }) {
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
-          color: theme.text,
         }}
       >
         <h2 style={{ textAlign: "center" }}>Checkout</h2>

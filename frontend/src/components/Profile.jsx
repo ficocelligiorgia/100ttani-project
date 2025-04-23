@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 import { FaUserCircle } from "react-icons/fa";
 
 function Profile({ onNotify, theme }) {

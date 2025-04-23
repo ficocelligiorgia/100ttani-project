@@ -5,9 +5,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const Stripe = require("stripe");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // 🔐 Usa la chiave Stripe dal .env
 
 // Middleware base
 app.use(cors());
@@ -42,6 +44,32 @@ app.use("/posts", require("./routes/posts"));
 app.use("/media", require("./routes/media"));
 app.use("/products", require("./routes/products"));
 app.use("/cart", require("./routes/cart")); // ✅ AGGIUNTO per il carrello
+
+// ✅ ROTTA STRIPE CHECKOUT
+app.post("/create-checkout-session", async (req, res) => {
+  const { cartItems } = req.body;
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: cartItems.map((item) => ({
+      price_data: {
+        currency: "eur",
+        product_data: {
+          name: item.name,
+        },
+        unit_amount: Math.round(item.price * 100),
+      },
+      quantity: item.quantity,
+    })),
+    mode: "payment",
+    success_url: "http://localhost:3000/success",
+    cancel_url: "http://localhost:3000/cancel",
+  });
+
+  // ✅ IMPORTANTE: restituisci sessionId
+  res.json({ id: session.id });
+});
+
 
 // Route base
 app.get("/", (req, res) => {

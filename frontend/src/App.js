@@ -9,8 +9,9 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import Shop from "./components/Shop";
 import ProductDetail from "./components/ProductDetail";
-import Profile from "./components/Profile"; 
-
+import Profile from "./components/Profile";
+import Success from "./components/Success";
+import Cancel from "./components/Cancel";
 
 const lightTheme = {
   background: "#ffffff",
@@ -184,9 +185,11 @@ function App() {
           }
         />
 
-        <Route path="/shop/:id" element={<ProductDetail theme={themeStyles} />} />
+        <Route
+          path="/shop/:id"
+          element={<ProductDetail theme={themeStyles} />}
+        />
 
-        
         <Route
           path="/profile"
           element={
@@ -201,6 +204,16 @@ function App() {
               />
             )
           }
+        />
+
+        {/* ✅ Rotte Stripe */}
+        <Route
+          path="/success"
+          element={<Success theme={themeStyles} />}
+        />
+        <Route
+          path="/cancel"
+          element={<Cancel theme={themeStyles} />}
         />
       </Routes>
     </>
