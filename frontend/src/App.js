@@ -15,7 +15,7 @@ import Cancel from "./components/Cancel";
 import { CartProvider } from "./components/CartContext";
 import Events from "./components/Events";
 import "leaflet/dist/leaflet.css";
-
+import CreaEvento from "./components/CreaEvento";
 
 const lightTheme = {
   background: "#ffffff",
@@ -91,7 +91,7 @@ function App() {
       const role = extractUserRole(token);
       if (role !== userRole) setUserRole(role);
     }
-  }, [themeStyles, token]);
+  }, [themeStyles, token, userRole]);
 
   return (
     <CartProvider>
@@ -189,10 +189,7 @@ function App() {
           }
         />
 
-        <Route
-          path="/shop/:id"
-          element={<ProductDetail theme={themeStyles} />}
-        />
+        <Route path="/shop/:id" element={<ProductDetail theme={themeStyles} />} />
 
         <Route
           path="/profile"
@@ -210,18 +207,23 @@ function App() {
           }
         />
 
-        <Route
-          path="/success"
-          element={<Success theme={themeStyles} />}
-        />
-        <Route
-          path="/cancel"
-          element={<Cancel theme={themeStyles} />}
-        />
+        <Route path="/success" element={<Success theme={themeStyles} />} />
+        <Route path="/cancel" element={<Cancel theme={themeStyles} />} />
 
         <Route
           path="/events"
-          element={<Events theme={themeStyles} />}
+          element={<Events theme={themeStyles} token={token} userRole={userRole} />}
+        />
+
+        <Route
+          path="/crea-evento"
+          element={
+            token ? (
+              <CreaEvento token={token} theme={themeStyles} onNotify={showNotification} />
+            ) : (
+              <Login onLoginSuccess={handleLoginSuccess} />
+            )
+          }
         />
       </Routes>
     </CartProvider>

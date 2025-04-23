@@ -18,78 +18,82 @@ function Events({ theme, token, userRole }) {
 
   return (
     <div style={{ padding: "2rem", color: theme.color, position: "relative" }}>
-      <h1>📅 Eventi della Community</h1>
-      <p>Qui troverai i nostri raduni passati e futuri, con sondaggi e foto!</p>
-
-      <div style={{ display: "grid", gap: "1.5rem", marginTop: "2rem" }}>
-        {events.map((event, i) => (
-          <div
-            key={i}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1>📅 Eventi della Community</h1>
+        {isAdmin && (
+          <button
+            onClick={() => navigate("/crea-evento")}
+            title="Crea nuovo evento"
             style={{
-              padding: "1rem",
-              border: `1px solid ${theme.borderColor}`,
-              borderRadius: "10px",
-              backgroundColor: theme.cardBackground,
-              color: theme.color,
+              backgroundColor: "crimson",
+              color: "#fff",
+              border: "none",
+              borderRadius: "50%",
+              width: "45px",
+              height: "45px",
+              fontSize: "1.3rem",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
             }}
           >
-            <h3>{event.title}</h3>
-            <p>{event.description}</p>
-            <p><strong>📍 Luogo:</strong> {event.location}</p>
-            <p><strong>📅 Data:</strong> {new Date(event.date).toLocaleDateString()}</p>
-            {event.image && (
-              <img
-                src={`http://localhost:5000${event.image}`}
-                alt={event.title}
-                style={{ width: "100%", maxHeight: "250px", objectFit: "cover", marginTop: "0.5rem", borderRadius: "6px" }}
-              />
-            )}
-
-            {event.poll && event.poll.question && (
-              <div style={{ marginTop: "1rem" }}>
-                <strong>{event.poll.question}</strong>
-                <ul>
-                  {event.poll.options.map((opt, idx) => (
-                    <li key={idx}>{opt.text} ({opt.votes})</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {event.coordinates?.lat && event.coordinates?.lng && (
-              <div style={{ height: "200px", marginTop: "1rem" }}>
-                <Map locations={[event]} mini={true} />
-              </div>
-            )}
-          </div>
-        ))}
+            <FaPlus />
+          </button>
+        )}
       </div>
 
-      {isAdmin && (
-        <button
-          onClick={() => navigate("/crea-evento")}
-          title="Crea nuovo evento"
-          style={{
-            position: "fixed",
-            top: "1rem",
-            right: "1rem",
-            backgroundColor: "crimson",
-            color: "#fff",
-            border: "none",
-            borderRadius: "50%",
-            width: "50px",
-            height: "50px",
-            fontSize: "1.4rem",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-            cursor: "pointer",
-            zIndex: 1000,
-          }}
-        >
-          <FaPlus />
-        </button>
+      <p>Qui troverai i nostri raduni passati e futuri, con sondaggi e foto!</p>
+
+      {events.length === 0 ? (
+        <p>Nessun evento disponibile.</p>
+      ) : (
+        <div style={{ marginTop: "2rem" }}>
+          {events.map((event) => (
+            <div
+              key={event._id}
+              style={{
+                backgroundColor: theme.cardBackground,
+                padding: "1rem",
+                marginBottom: "1.5rem",
+                borderRadius: "10px",
+              }}
+            >
+              <h3>{event.title}</h3>
+              <p>{event.description}</p>
+              <p><strong>📍 {event.location}</strong></p>
+              <p><strong>📅 {new Date(event.date).toLocaleDateString()}</strong></p>
+
+              {event.image && (
+                <img
+                  src={`http://localhost:5000${event.image}`}
+                  alt="Evento"
+                  style={{ maxWidth: "100%", marginTop: "1rem", borderRadius: "8px" }}
+                />
+              )}
+
+              {event.poll?.question && (
+                <div style={{ marginTop: "1rem" }}>
+                  <strong>Sondaggio: {event.poll.question}</strong>
+                  <ul>
+                    {event.poll.options.map((opt, idx) => (
+                      <li key={idx}>
+                        {opt.text} - {opt.votes} voti
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {event.coordinates?.lat && event.coordinates?.lng && (
+                <div style={{ marginTop: "1rem" }}>
+                  <Map locations={[event]} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
