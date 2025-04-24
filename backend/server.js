@@ -9,23 +9,20 @@ const Stripe = require("stripe");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // 🔐 Usa la chiave Stripe dal .env
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Middleware base
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
+// Static files (per immagini caricate)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connessione MongoDB
 console.log("🔌 MONGO_URI:", process.env.MONGO_URI);
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connesso"))
   .catch((err) => {
     console.error("❌ Errore di connessione a MongoDB:", err);
@@ -34,42 +31,44 @@ mongoose
 
 // Modelli
 require("./models/user");
-require("./models/cart"); // ✅ AGGIUNTO per il carrello
-require("./models/Event")// ✅ AGGIUNTO per eventi
+require("./models/cart");
+require("./models/Event");
 
-// Rotte
+// Rotte API
 app.use("/register", require("./routes/register"));
 app.use("/login", require("./routes/login"));
 app.use("/profile", require("./routes/profile"));
 app.use("/posts", require("./routes/posts"));
 app.use("/media", require("./routes/media"));
 app.use("/products", require("./routes/products"));
-app.use("/cart", require("./routes/cart")); // ✅ AGGIUNTO per il carrello
-app.use("/events", require("./routes/events")); // ✅ AGGIUNTO per eventi
+app.use("/cart", require("./routes/cart"));
+app.use("/events", require("./routes/events")); // ✅ Rotta eventi
 
-// ✅ ROTTA STRIPE CHECKOUT
+// Pagamento Stripe
 app.post("/create-checkout-session", async (req, res) => {
   const { cartItems } = req.body;
 
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    line_items: cartItems.map((item) => ({
-      price_data: {
-        currency: "eur",
-        product_data: {
-          name: item.name,
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: cartItems.map((item) => ({
+        price_data: {
+          currency: "eur",
+          product_data: { name: item.name },
+          unit_amount: Math.round(item.price * 100),
         },
-        unit_amount: Math.round(item.price * 100),
-      },
-      quantity: item.quantity,
-    })),
-    mode: "payment",
-    success_url: "http://localhost:3000/success",
-    cancel_url: "http://localhost:3000/cancel",
-  });
+        quantity: item.quantity,
+      })),
+      mode: "payment",
+      success_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+    });
 
-  // ✅ IMPORTANTE: restituisci sessionId
-  res.json({ id: session.id });
+    res.json({ id: session.id });
+  } catch (err) {
+    console.error("❌ Errore Stripe:", err);
+    res.status(500).json({ error: "Errore nella sessione di pagamento" });
+  }
 });
 
 // Route base

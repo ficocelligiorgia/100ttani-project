@@ -12,7 +12,10 @@ function Events({ theme, token, userRole }) {
   useEffect(() => {
     axios
       .get("http://localhost:5000/events")
-      .then((res) => setEvents(res.data))
+      .then((res) => {
+        console.log("Eventi ricevuti:", res.data);
+        setEvents(res.data);
+      })
       .catch((err) => console.error("Errore nel recupero eventi", err));
   }, []);
 
@@ -31,12 +34,12 @@ function Events({ theme, token, userRole }) {
               borderRadius: "50%",
               width: "45px",
               height: "45px",
-              fontSize: "1.3rem",
+              fontSize: "1.2rem",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
             }}
           >
             <FaPlus />
@@ -49,51 +52,64 @@ function Events({ theme, token, userRole }) {
       {events.length === 0 ? (
         <p>Nessun evento disponibile.</p>
       ) : (
-        <div style={{ marginTop: "2rem" }}>
-          {events.map((event) => (
-            <div
-              key={event._id}
-              style={{
-                backgroundColor: theme.cardBackground,
-                padding: "1rem",
-                marginBottom: "1.5rem",
-                borderRadius: "10px",
-              }}
-            >
-              <h3>{event.title}</h3>
-              <p>{event.description}</p>
-              <p><strong>📍 {event.location}</strong></p>
-              <p><strong>📅 {new Date(event.date).toLocaleDateString()}</strong></p>
+        events.map((event, index) => (
+          <div
+            key={index}
+            style={{
+              marginTop: "2rem",
+              padding: "1rem",
+              background: theme.cardBackground,
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h2>📍 {event.title || "Senza titolo"}</h2>
 
-              {event.image && (
-                <img
-                  src={`http://localhost:5000${event.image}`}
-                  alt="Evento"
-                  style={{ maxWidth: "100%", marginTop: "1rem", borderRadius: "8px" }}
-                />
-              )}
+            <p>
+              📅 {event.date ? new Date(event.date).toLocaleDateString("it-IT", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }) : "Data non specificata"}
+            </p>
 
-              {event.poll?.question && (
-                <div style={{ marginTop: "1rem" }}>
-                  <strong>Sondaggio: {event.poll.question}</strong>
-                  <ul>
-                    {event.poll.options.map((opt, idx) => (
-                      <li key={idx}>
-                        {opt.text} - {opt.votes} voti
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+            <p>
+              📍 <i>{event.location || "Nessuna posizione"}</i>
+            </p>
 
-              {event.coordinates?.lat && event.coordinates?.lng && (
-                <div style={{ marginTop: "1rem" }}>
-                  <Map locations={[event]} />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+            {event.description && <p>{event.description}</p>}
+
+            {event.image && (
+              <img
+                src={`http://localhost:5000${event.image}`}
+                alt="Evento"
+                style={{ maxWidth: "100%", borderRadius: "6px", marginTop: "1rem" }}
+              />
+            )}
+
+            {event.coordinates?.lat && event.coordinates?.lng && (
+              <div style={{ marginTop: "1rem" }}>
+                <Map locations={[event]} />
+              </div>
+            )}
+
+            {event.poll?.question ? (
+              <div style={{ marginTop: "1rem" }}>
+                <h4>🗳 {event.poll.question}</h4>
+                <ul style={{ paddingLeft: "1rem" }}>
+                  {event.poll.options.map((opt, i) => (
+                    <li key={i}>
+                      {opt.text} — <strong>{opt.votes} voti</strong>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p>🧾 <i>Nessun sondaggio disponibile</i></p>
+            )}
+          </div>
+        ))
       )}
     </div>
   );

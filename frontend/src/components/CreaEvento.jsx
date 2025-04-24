@@ -10,10 +10,11 @@ function CreaEvento({ theme, token, onNotify }) {
     location: "",
     lat: "",
     lng: "",
-    question: "",
+    pollQuestion: "",
     options: ["", ""],
     image: null,
   });
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -44,22 +45,28 @@ function CreaEvento({ theme, token, onNotify }) {
     formData.append("location", form.location);
     formData.append("coordinates[lat]", form.lat);
     formData.append("coordinates[lng]", form.lng);
-    formData.append("poll[question]", form.question);
-    form.options.forEach((opt, i) => formData.append(`poll[options][${i}][text]`, opt));
-    if (form.image) formData.append("image", form.image);
+    formData.append("poll[question]", form.pollQuestion);
+
+    form.options.forEach((opt, i) =>
+      formData.append(`poll[options][${i}]`, opt)
+    );
+
+    if (form.image) {
+      formData.append("image", form.image);
+    }
 
     try {
-      await axios.post("http://localhost:5000/events", formData, {
+      await axios.post("http://localhost:5000/Events", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
       onNotify("✅ Evento creato con successo", "success");
-      navigate("/events");
+      navigate("/Events");
     } catch (err) {
+      console.error("Errore nella creazione evento:", err);
       onNotify("❌ Errore nella creazione evento", "error");
-      console.error(err);
     }
   };
 
@@ -75,7 +82,7 @@ function CreaEvento({ theme, token, onNotify }) {
         <input name="lng" placeholder="Longitudine" value={form.lng} onChange={handleChange} style={inputStyle(theme)} />
 
         <h4>Sondaggio</h4>
-        <input name="question" placeholder="Domanda del sondaggio" value={form.question} onChange={handleChange} style={inputStyle(theme)} />
+        <input name="pollQuestion" placeholder="Domanda sondaggio" value={form.pollQuestion} onChange={handleChange} style={inputStyle(theme)} />
         {form.options.map((opt, i) => (
           <input
             key={i}
@@ -85,10 +92,10 @@ function CreaEvento({ theme, token, onNotify }) {
             style={inputStyle(theme)}
           />
         ))}
-        <button type="button" onClick={addOption} style={buttonStyle}>Aggiungi opzione</button>
+        <button type="button" onClick={addOption} style={buttonStyle}>➕ Aggiungi opzione</button>
 
         <input type="file" onChange={handleFileChange} accept="image/*" style={{ marginTop: "1rem" }} />
-        <button type="submit" style={buttonStyle}>Crea Evento</button>
+        <button type="submit" style={buttonStyle}>📌 Crea Evento</button>
       </form>
     </div>
   );
