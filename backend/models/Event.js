@@ -6,8 +6,8 @@ const eventSchema = new mongoose.Schema({
   date: Date,
   location: String,
   coordinates: {
-    lat: Number,
-    lng: Number,
+    lat:{ type: Number, required:false},
+    lng:{ type: Number, required:false},
   },
   image: String, // URL o percorso immagine
   poll: {

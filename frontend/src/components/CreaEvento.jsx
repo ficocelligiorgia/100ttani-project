@@ -48,7 +48,8 @@ function CreaEvento({ theme, token, onNotify }) {
     formData.append("poll[question]", form.pollQuestion);
 
     form.options.forEach((opt, i) =>
-      formData.append(`poll[options][${i}]`, opt)
+      formData.append(`poll[options][${i}][text]`, opt)
+    // formData.append(`poll[options][${i}][text]`, opt)
     );
 
     if (form.image) {

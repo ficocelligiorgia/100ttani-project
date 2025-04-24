@@ -44,32 +44,17 @@ router.post(
         description,
         date,
         location,
-        "coordinates[lat]": lat,
-        "coordinates[lng]": lng,
-        "poll[question]": question,
+        coordinates,
+        poll
       } = req.body;
-
-      // 📌 Estrai le opzioni del sondaggio
-      const options = Object.keys(req.body)
-        .filter((key) => key.startsWith("poll[options]"))
-        .map((key) => ({
-          text: req.body[key],
-          votes: 0,
-        }));
 
       const newEvent = new Event({
         title,
         description,
         date,
         location,
-        coordinates: {
-          lat: parseFloat(lat),
-          lng: parseFloat(lng),
-        },
-        poll: {
-          question,
-          options,
-        },
+        coordinates,
+        poll,
         image: req.file ? `/uploads/${req.file.filename}` : null,
         createdBy: req.user.id,
       });

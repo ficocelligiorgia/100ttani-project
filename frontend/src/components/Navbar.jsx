@@ -46,7 +46,7 @@ function Navbar({
             <NavLink label=" Profilo" onClick={() => onNavigate("/profile")} />
             <NavLink label=" Eventi" onClick={() => onNavigate("/events")} />
             <NavLink label=" Shop" onClick={() => onNavigate("/shop")} />
-            <NavLink label=" Info" onClick={() => onNavigate("/about")} />
+            <NavLink label=" Info" onClick={() => onNavigate("/info")} />
           </>
         )}
 
@@ -106,3 +106,4 @@ function NavLink({ label, onClick, styleOverride = {} }) {
 }
 
 export default Navbar;
+

@@ -16,6 +16,7 @@ import { CartProvider } from "./components/CartContext";
 import Events from "./components/Events";
 import "leaflet/dist/leaflet.css";
 import CreaEvento from "./components/CreaEvento";
+import Info from "./components/Info";
 
 const lightTheme = {
   background: "#ffffff",
@@ -225,9 +226,15 @@ function App() {
             )
           }
         />
+
+        <Route
+          path="/info"
+          element={<Info />}
+        />
       </Routes>
     </CartProvider>
   );
 }
 
 export default App;
+
