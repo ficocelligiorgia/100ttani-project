@@ -6,7 +6,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// 🔧 Configura multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = "uploads/";
@@ -23,7 +22,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// 🔐 GET: Recupera i dati utente
+
 router.get("/", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -37,7 +36,6 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// 🔐 POST: Aggiorna dati e avatar
 router.post("/update", verifyToken, upload.single("avatar"), async (req, res) => {
   try {
     const { username, email, phone, address, bio } = req.body;

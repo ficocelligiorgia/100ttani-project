@@ -8,30 +8,30 @@ router.post("/", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // 🔎 Cerca l'utente
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "Utente non trovato" });
     }
 
-    // 🔐 Verifica password
+    
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Password errata" });
     }
 
-    // 🎫 Crea token con ruolo incluso
+   
     const token = jwt.sign(
       {
         id: user._id,
         email: user.email,
-        role: user.role, // 👈 Aggiunto!
+        role: user.role, 
       },
       process.env.JWT_SECRET,
       { expiresIn: "365h" }
     );
 
-    // ✅ Risposta
+   
     res.status(200).json({
       message: "Login riuscito",
       token,
@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        role: user.role, // 👈 Incluso anche nella risposta
+        role: user.role, 
       },
     });
   } catch (err) {

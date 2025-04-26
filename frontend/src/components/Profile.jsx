@@ -7,6 +7,7 @@ import CartDrawer from "./CartDrawer";
 function Profile({ onNotify, theme }) {
   const [user, setUser] = useState({});
   const [media, setMedia] = useState([]);
+  const [event, setEvent] = useState(null);
   const [showInfo, setShowInfo] = useState(false);
   const [commentText, setCommentText] = useState({});
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -27,9 +28,19 @@ function Profile({ onNotify, theme }) {
     }
   };
 
+  const fetchLatestEvent = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/events");
+      setEvent(res.data[res.data.length - 1] || null);
+    } catch (err) {
+      console.error("Errore caricamento evento", err);
+    }
+  };
+
   useEffect(() => {
     if (token) {
       fetchUser();
+      fetchLatestEvent();
       axios
         .get("http://localhost:5000/media?mine=true", {
           headers: { Authorization: `Bearer ${token}` },
@@ -148,74 +159,65 @@ function Profile({ onNotify, theme }) {
           </div>
         </div>
 
-        <h2>I tuoi Media</h2>
-        {media.length === 0 ? (
-          <p>Non hai pubblicato nulla.</p>
-        ) : (
-          media.map((m) => (
-            <div
-              key={m._id}
-              style={{
-                background: theme.cardBackground,
-                color: theme.color,
-                padding: "1rem",
-                marginBottom: "2rem",
-                borderRadius: "10px",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                maxWidth: "500px",
-              }}
-            >
-              {m.fileType === "image" ? (
-                <img src={`http://localhost:5000${m.fileUrl}`} alt={m.title} style={imageStyle} />
-              ) : (
-                <video controls src={`http://localhost:5000${m.fileUrl}`} style={imageStyle} />
-              )}
-              <h4>{m.title}</h4>
-              <button onClick={() => handleLike(m._id)} style={{ background: "none", border: "none", color: theme.color }}>
-                ❤️ {m.likes?.length || 0} like
-              </button>
-              <div>
-                <input
-                  type="text"
-                  placeholder="Scrivi un commento..."
-                  value={commentText[m._id] || ""}
-                  onChange={(e) => setCommentText({ ...commentText, [m._id]: e.target.value })}
-                  style={{
-                    width: "100%",
-                    marginTop: "0.5rem",
-                    background: theme.inputBackground,
-                    color: theme.color,
-                    border: `1px solid ${theme.borderColor}`,
-                    borderRadius: "6px",
-                    padding: "0.3rem",
-                  }}
-                />
-                <button onClick={() => handleComment(m._id)} style={sendBtnStyle}>Invia</button>
-              </div>
-              <div style={{ marginTop: "1rem" }}>
-                <strong>Commenti:</strong>
-                {m.comments?.length ? (
-                  m.comments.map((c, i) => (
-                    <p key={i}><strong>{c.user?.username || "Anonimo"}:</strong> {c.text}</p>
-                  ))
+        <div style={{ display: "flex", gap: "2rem" }}>
+          <div style={{ flex: 1 }}>
+            {media.map((m) => (
+              <div
+                key={m._id}
+                style={{
+                  background: theme.cardBackground,
+                  color: theme.color,
+                  padding: "1rem",
+                  marginBottom: "2rem",
+                  borderRadius: "10px",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                  maxWidth: "500px",
+                }}
+              >
+                {m.fileType === "image" ? (
+                  <img src={`http://localhost:5000${m.fileUrl}`} alt={m.title} style={imageStyle} />
                 ) : (
-                  <p>Nessun commento ancora.</p>
+                  <video controls src={`http://localhost:5000${m.fileUrl}`} style={imageStyle} />
                 )}
+                <h4>{m.title}</h4>
+                <button onClick={() => handleLike(m._id)} style={{ background: "none", border: "none", color: theme.color }}>
+                  ❤️ {m.likes?.length || 0} like
+                </button>
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Scrivi un commento..."
+                    value={commentText[m._id] || ""}
+                    onChange={(e) => setCommentText({ ...commentText, [m._id]: e.target.value })}
+                    style={inputStyle(theme)}
+                  />
+                  <button onClick={() => handleComment(m._id)} style={sendBtnStyle}>Invia</button>
+                </div>
+                <div style={{ marginTop: "1rem" }}>
+                  <strong>Commenti:</strong>
+                  {m.comments?.length ? (
+                    m.comments.map((c, i) => (
+                      <p key={i}><strong>{c.user?.username || "Anonimo"}:</strong> {c.text}</p>
+                    ))
+                  ) : (
+                    <p>Nessun commento ancora.</p>
+                  )}
+                </div>
+                <button onClick={() => handleDelete(m._id)} style={deleteBtnStyle}>Elimina</button>
               </div>
-              <button onClick={() => handleDelete(m._id)} style={deleteBtnStyle}>Elimina</button>
+            ))}
+          </div>
+
+          {event && (
+            <div style={{ flex: 1, background: theme.cardBackground, padding: "1rem", borderRadius: "10px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>
+              <h3>📍 {event.title}</h3>
+              <p>{event.description}</p>
             </div>
-          ))
-        )}
+          )}
+        </div>
       </div>
 
-      <div style={{
-        width: "220px",
-        minHeight: "100vh",
-        background: theme.cardBackground,
-        color: theme.color,
-        padding: "1rem",
-        boxShadow: "-2px 0 5px rgba(0,0,0,0.1)",
-      }}>
+      <div style={{ width: "250px", minHeight: "100vh", background: theme.cardBackground, color: theme.color, padding: "1rem", boxShadow: "-2px 0 5px rgba(0,0,0,0.1)" }}>
         <button onClick={() => setShowInfo(!showInfo)} style={sideBtnStyle}>Informazioni personali ▼</button>
         {showInfo && (
           <div>
@@ -242,6 +244,11 @@ function Profile({ onNotify, theme }) {
         )}
 
         <button onClick={() => setCartOpen(true)} style={{ ...sideBtnStyle, marginTop: "1rem" }}>🛒 Apri Carrello</button>
+
+        <div style={{ marginTop: "2rem" }}>
+          <a href="https://chat.whatsapp.com/EtEtsQ9G6G75kI0L7fr8k4?utm_campaign=linkinbio&utm_medium=referral&utm_source=later-linkinbio" target="_blank" rel="noopener noreferrer" style={{ display: "block", marginBottom: "1rem", color: "crimson" }}>Gruppo WhatsApp</a>
+          <a href="https://www.instagram.com/100ttani_motoclub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" style={{ display: "block", color: "crimson" }}>Pagina Instagram</a>
+        </div>
       </div>
 
       <CartDrawer
@@ -267,6 +274,16 @@ const imageStyle = {
   objectFit: "cover",
   borderRadius: "8px",
 };
+
+const inputStyle = (theme) => ({
+  width: "100%",
+  marginBottom: "0.5rem",
+  background: theme.inputBackground,
+  color: theme.color,
+  border: `1px solid ${theme.borderColor}`,
+  borderRadius: "6px",
+  padding: "0.4rem",
+});
 
 const sendBtnStyle = {
   marginTop: "0.5rem",
@@ -307,15 +324,5 @@ const sideBtnStyle = {
   cursor: "pointer",
   marginBottom: "1rem",
 };
-
-const inputStyle = (theme) => ({
-  width: "100%",
-  marginBottom: "0.5rem",
-  background: theme.inputBackground || "#fff",
-  color: theme.color,
-  border: `1px solid ${theme.borderColor}`,
-  borderRadius: "6px",
-  padding: "0.4rem",
-});
 
 export default Profile;

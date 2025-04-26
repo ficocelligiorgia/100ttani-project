@@ -6,7 +6,7 @@ const path = require("path");
 const fs = require("fs");
 const { verifyToken, authorizeRoles } = require("../middleware/auth");
 
-// 🔧 Configurazione Multer
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "../uploads"));
@@ -18,18 +18,18 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// 📦 GET prodotti
+
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find();
     res.json(products);
   } catch (err) {
-    console.error("❌ Errore nel recupero prodotti:", err);
+    console.error(" Errore nel recupero prodotti:", err);
     res.status(500).json({ message: "Errore nel recupero prodotti" });
   }
 });
 
-// ➕ POST prodotto con più immagini
+
 router.post(
   "/",
   verifyToken,
@@ -53,15 +53,15 @@ router.post(
       });
 
       const saved = await newProduct.save();
-      res.status(201).json({ message: "✅ Prodotto salvato", product: saved });
+      res.status(201).json({ message: " Prodotto salvato", product: saved });
     } catch (err) {
-      console.error("❌ Errore nel salvataggio:", err);
+      console.error(" Errore nel salvataggio:", err);
       res.status(500).json({ message: "Errore nel salvataggio del prodotto" });
     }
   }
 );
 
-// 🗑️ DELETE prodotto + immagini
+
 router.delete("/:id", verifyToken, authorizeRoles("admin", "staff"), async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -69,7 +69,7 @@ router.delete("/:id", verifyToken, authorizeRoles("admin", "staff"), async (req,
       return res.status(404).json({ message: "Prodotto non trovato" });
     }
 
-    // Elimina immagini fisiche
+
     product.images?.forEach((imgPath) => {
       const fullPath = path.join(__dirname, "..", imgPath);
       if (fs.existsSync(fullPath)) {
@@ -78,9 +78,9 @@ router.delete("/:id", verifyToken, authorizeRoles("admin", "staff"), async (req,
     });
 
     await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "✅ Prodotto eliminato con successo" });
+    res.json({ message: " Prodotto eliminato con successo" });
   } catch (err) {
-    console.error("❌ Errore DELETE /products/:id:", err);
+    console.error(" Errore DELETE /products/:id:", err);
     res.status(500).json({ message: "Errore durante l'eliminazione" });
   }
 });

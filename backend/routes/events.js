@@ -6,7 +6,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// 📁 Configura storage per multer
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, "../uploads");
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// 🟢 GET tutti gli eventi
+
 router.get("/", async (req, res) => {
   try {
     const events = await Event.find().sort({ date: 1 });
@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 🔴 POST nuovo evento (admin e staff)
+
 router.post(
   "/",
   verifyToken,
@@ -62,13 +62,13 @@ router.post(
       await newEvent.save();
       res.status(201).json(newEvent);
     } catch (err) {
-      console.error("❌ Errore nella creazione evento:", err);
+      console.error(" Errore nella creazione evento:", err);
       res.status(500).json({ error: "Errore nella creazione evento" });
     }
   }
 );
 
-// ✅ AGGIUNTA: Votare un'opzione del sondaggio
+
 router.post("/:id/vote", async (req, res) => {
   try {
     const { optionIndex } = req.body;
@@ -83,12 +83,12 @@ router.post("/:id/vote", async (req, res) => {
 
     res.json({ message: "Voto registrato con successo" });
   } catch (err) {
-    console.error("❌ Errore nella votazione:", err);
+    console.error(" Errore nella votazione:", err);
     res.status(500).json({ error: "Errore nella votazione" });
   }
 });
 
-// ✅ AGGIUNTA: Eliminare un evento (solo admin/staff)
+
 router.delete("/:id", verifyToken, authorizeRoles("admin", "staff"), async (req, res) => {
   try {
     const event = await Event.findByIdAndDelete(req.params.id);
@@ -99,7 +99,7 @@ router.delete("/:id", verifyToken, authorizeRoles("admin", "staff"), async (req,
 
     res.json({ message: "Evento eliminato con successo" });
   } catch (err) {
-    console.error("❌ Errore nella cancellazione evento:", err);
+    console.error(" Errore nella cancellazione evento:", err);
     res.status(500).json({ error: "Errore nella cancellazione evento" });
   }
 });

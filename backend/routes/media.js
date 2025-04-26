@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// 🔹 Crea nuovo media
+
 router.post("/", verifyToken, upload.single("file"), async (req, res) => {
   try {
     const newMedia = new Media({
@@ -29,7 +29,7 @@ router.post("/", verifyToken, upload.single("file"), async (req, res) => {
   }
 });
 
-// 🔹 Recupera media globali o personali con ?mine=true
+
 router.get("/", verifyToken, async (req, res) => {
   try {
     const filter = req.query.mine === "true" ? { userId: req.user.id } : {};
@@ -44,7 +44,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Like / Unlike
+
 router.post("/:id/like", verifyToken, async (req, res) => {
   const media = await Media.findById(req.params.id);
   if (!media) return res.status(404).json({ message: "Media non trovato" });
@@ -61,7 +61,7 @@ router.post("/:id/like", verifyToken, async (req, res) => {
   res.json({ liked: !alreadyLiked, totalLikes: media.likes.length });
 });
 
-// 🔹 Commento
+
 router.post("/:id/comment", verifyToken, async (req, res) => {
   const { text } = req.body;
   const mediaId = req.params.id;
@@ -85,7 +85,7 @@ router.post("/:id/comment", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Elimina media
+
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const media = await Media.findById(req.params.id);
