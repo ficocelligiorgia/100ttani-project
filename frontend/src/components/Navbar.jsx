@@ -20,7 +20,7 @@ function Navbar({
         fontFamily: "sans-serif",
       }}
     >
-      {/* 🔗 Logo/Home */}
+      
       <a
         href="/"
         style={{
@@ -37,7 +37,7 @@ function Navbar({
         />
       </a>
 
-      {/* 🔗 Navigazione utente */}
+      
       <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
         {isLoggedIn && (
           <>
@@ -65,7 +65,7 @@ function Navbar({
           {isDark ? "☀️" : "🌙"}
         </button>
 
-        {/* Login / Logout */}
+        
         {isLoggedIn ? (
           <NavLink
             label=" Logout"

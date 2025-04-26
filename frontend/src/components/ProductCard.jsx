@@ -76,7 +76,7 @@ function ProductCard({ product, onSelect, onDelete, onAddToCart, userRole, theme
         {parseFloat(product.price).toFixed(2)} €
       </p>
 
-      {/* ✅ Bottone Aggiungi al carrello */}
+      
       <button
         onClick={(e) => {
           e.stopPropagation();

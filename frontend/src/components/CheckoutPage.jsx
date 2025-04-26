@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 
-// 🔑 Inserisci la tua vera chiave pubblica qui
+
 const stripePromise = loadStripe("pk_test_51RH5DhPkBSJO0ZIST0mGasAEpCBzN8OJJA1QyZF0JKIwXyiEGihnGmvfs4wrpsyU77qeSun3X1BpOn1NXEd6WuEX00kuuca9Xr");
 
-// Temi completi
+
 const themes = {
   light: {
     background: "#f5f5f5",
@@ -61,7 +61,7 @@ function CheckoutPage({ cartItems, onBack, onComplete }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Salva il carrello per Success.jsx
+    
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
 
     try {
@@ -75,10 +75,10 @@ function CheckoutPage({ cartItems, onBack, onComplete }) {
 
       const stripe = await stripePromise;
 
-      // ✅ Redirect corretto con sessionId
+      
       await stripe.redirectToCheckout({ sessionId: data.id });
     } catch (error) {
-      console.error("❌ Errore durante il pagamento:", error);
+      console.error(" Errore durante il pagamento:", error);
       alert("Errore nel processo di pagamento. Riprova.");
     }
   };

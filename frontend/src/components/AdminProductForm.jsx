@@ -31,7 +31,7 @@ function AdminProductForm({ onProductCreated, theme }) {
     const token = localStorage.getItem("token");
 
     if (!form.images || form.images.length === 0) {
-      setMessage("❗ Devi selezionare almeno un'immagine.");
+      setMessage(" Devi selezionare almeno un'immagine.");
       return;
     }
 
@@ -52,7 +52,7 @@ function AdminProductForm({ onProductCreated, theme }) {
         },
       });
 
-      setMessage("✅ Prodotto caricato con successo!");
+      setMessage(" Prodotto caricato con successo!");
       onProductCreated && onProductCreated(res.data.product);
 
       setForm({
@@ -63,8 +63,8 @@ function AdminProductForm({ onProductCreated, theme }) {
         images: [],
       });
     } catch (err) {
-      console.error("❌ Errore upload prodotto:", err);
-      setMessage("❌ Errore durante il caricamento.");
+      console.error("Errore upload prodotto:", err);
+      setMessage("Errore durante il caricamento.");
     }
   };
 
@@ -77,7 +77,7 @@ function AdminProductForm({ onProductCreated, theme }) {
         borderRadius: "8px",
       }}
     >
-      <h2>📦 Aggiungi un nuovo prodotto</h2>
+      <h2> Aggiungi un nuovo prodotto</h2>
 
       <form onSubmit={handleSubmit}>
         <input

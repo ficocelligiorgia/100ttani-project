@@ -65,7 +65,7 @@ function App() {
     localStorage.setItem("token", receivedToken);
     setToken(receivedToken);
     setUserRole(extractUserRole(receivedToken));
-    showNotification("✅ Login effettuato!", "success");
+    showNotification(" Login effettuato!", "success");
     navigate("/");
   };
 
@@ -73,7 +73,7 @@ function App() {
     localStorage.removeItem("token");
     setToken(null);
     setUserRole("");
-    showNotification("🔓 Logout effettuato", "info");
+    showNotification(" Logout effettuato", "info");
     navigate("/");
   };
 

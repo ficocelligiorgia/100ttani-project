@@ -38,10 +38,10 @@ function Shop({ theme, token, userRole, onNotify }) {
         },
       });
       setProducts((prev) => prev.filter((p) => p._id !== productId));
-      onNotify?.("✅ Prodotto eliminato", "success");
+      onNotify?.(" Prodotto eliminato", "success");
     } catch (err) {
       console.error("Errore nella cancellazione del prodotto:", err);
-      onNotify?.("❌ Errore durante l'eliminazione", "error");
+      onNotify?.(" Errore durante l'eliminazione", "error");
     }
   };
 
@@ -61,7 +61,7 @@ function Shop({ theme, token, userRole, onNotify }) {
 
   const handleOrderComplete = () => {
     setCheckoutOpen(false);
-    onNotify?.("✅ Ordine completato!", "success");
+    onNotify?.(" Ordine completato!", "success");
   };
 
   useEffect(() => {
@@ -77,7 +77,6 @@ function Shop({ theme, token, userRole, onNotify }) {
           alignItems: "center",
         }}
       >
-        <h1 style={{ color: theme.color }}>Shop</h1>
         <button
           onClick={() => setCartOpen(true)}
           title="Apri carrello"

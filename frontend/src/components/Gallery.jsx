@@ -273,7 +273,7 @@ function Gallery({ onNotify, theme, onAddPostClick }) {
         </button>
       </div>
 
-      <h2>Galleria</h2>
+      
 
       {loading ? (
         <Spinner theme={theme} />

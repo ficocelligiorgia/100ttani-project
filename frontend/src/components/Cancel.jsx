@@ -11,7 +11,7 @@ export default function Cancel({ theme }) {
         minHeight: "100vh",
       }}
     >
-      <h1>❌ Pagamento annullato</h1>
+      <h1> Pagamento annullato</h1>
       <p>Hai annullato il processo di pagamento. Puoi riprovare quando vuoi.</p>
     </div>
   );

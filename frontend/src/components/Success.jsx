@@ -14,11 +14,11 @@ export default function Success({ theme }) {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log("✅ Ordine salvato:", data);
-          localStorage.removeItem("cartItems"); // svuota carrello
+          console.log(" Ordine salvato:", data);
+          localStorage.removeItem("cartItems"); 
         })
         .catch((err) => {
-          console.error("❌ Errore salvataggio ordine:", err);
+          console.error(" Errore salvataggio ordine:", err);
         });
     }
   }, []);

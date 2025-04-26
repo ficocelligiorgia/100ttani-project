@@ -49,7 +49,7 @@ function CreaEvento({ theme, token, onNotify }) {
 
     form.options.forEach((opt, i) =>
       formData.append(`poll[options][${i}][text]`, opt)
-    // formData.append(`poll[options][${i}][text]`, opt)
+    
     );
 
     if (form.image) {
@@ -63,11 +63,11 @@ function CreaEvento({ theme, token, onNotify }) {
           "Content-Type": "multipart/form-data",
         },
       });
-      onNotify("✅ Evento creato con successo", "success");
+      onNotify(" Evento creato con successo", "success");
       navigate("/Events");
     } catch (err) {
       console.error("Errore nella creazione evento:", err);
-      onNotify("❌ Errore nella creazione evento", "error");
+      onNotify(" Errore nella creazione evento", "error");
     }
   };
 
@@ -96,7 +96,7 @@ function CreaEvento({ theme, token, onNotify }) {
         <button type="button" onClick={addOption} style={buttonStyle}>➕ Aggiungi opzione</button>
 
         <input type="file" onChange={handleFileChange} accept="image/*" style={{ marginTop: "1rem" }} />
-        <button type="submit" style={buttonStyle}>📌 Crea Evento</button>
+        <button type="submit" style={buttonStyle}> Crea Evento</button>
       </form>
     </div>
   );

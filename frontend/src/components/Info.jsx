@@ -4,7 +4,7 @@ const Info = () => {
   return (
     <div className="bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-100 transition-colors">
 
-      {/* Hero Intro */}
+      
       <section
         className="relative h-[60vh] flex items-center justify-center text-center bg-cover bg-center"
         style={{ backgroundImage: "url('/cover-bike.jpg')" }}
@@ -20,7 +20,7 @@ const Info = () => {
         </div>
       </section>
 
-      {/* Chi siamo */}
+      
       <section className="max-w-5xl mx-auto py-16 px-6">
         <h2 className="text-4xl font-bold text-red-600 mb-6 border-b-2 border-red-600 inline-block pb-1">
           Chi siamo
@@ -37,20 +37,20 @@ const Info = () => {
             👥 Amministratori del gruppo
           </h3>
           <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 text-lg text-gray-800 dark:text-gray-200">
-            <li className="hover:text-red-500 transition">🏍️ Luca</li>
-            <li className="hover:text-red-500 transition">🛠️ Francesco</li>
-            <li className="hover:text-red-500 transition">🧭 Michela</li>
-            <li className="hover:text-red-500 transition">⚙️ Luis</li>
-            <li className="hover:text-red-500 transition">🔥 Riccardo</li>
+            <li className="hover:text-red-500 transition"> Luca</li>
+            <li className="hover:text-red-500 transition"> Francesco</li>
+            <li className="hover:text-red-500 transition"> Michela</li>
+            <li className="hover:text-red-500 transition"> Luis</li>
+            <li className="hover:text-red-500 transition"> Riccardo</li>
           </ul>
         </div>
       </section>
 
-      {/* Dove ci trovi */}
+      
       <section className="bg-gray-100 dark:bg-gray-800 py-16">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-red-600 mb-6 border-b-2 border-red-600 inline-block pb-1">
-            📍 Dove ci trovi
+             Dove ci trovi
           </h2>
           <p className="text-lg leading-relaxed">
             La nostra casa è <strong>Roma</strong>, ma appena accendiamo i
@@ -61,11 +61,11 @@ const Info = () => {
         </div>
       </section>
 
-      {/* Contatti */}
+      
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-red-600 mb-6 border-b-2 border-red-600 inline-block pb-1">
-            📬 Contatti
+             Contatti
           </h2>
           <p className="text-lg mb-4">
             Entra in contatto con noi o unisciti alla prossima uscita:

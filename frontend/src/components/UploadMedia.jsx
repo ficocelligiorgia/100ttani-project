@@ -22,7 +22,7 @@ function UploadMedia({ onNotify, theme, onUploadSuccess }) {
     e.preventDefault();
 
     if (!file) {
-      setMessage("❌ Devi selezionare un file.");
+      setMessage("Devi selezionare un file.");
       return;
     }
 
@@ -43,25 +43,25 @@ function UploadMedia({ onNotify, theme, onUploadSuccess }) {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("✅ Media caricato con successo!");
+        setMessage("Media caricato con successo!");
         setTitle("");
         setFile(null);
         setPreviewUrl(null);
-        onNotify && onNotify("✅ Media caricato con successo!", "success");
+        onNotify && onNotify(" Media caricato con successo!", "success");
 
-        // 🔁 Naviga alla galleria dopo il successo
+        
         if (onUploadSuccess) {
           onUploadSuccess();
         }
 
       } else {
-        setMessage(`❌ Errore: ${data.message}`);
-        onNotify && onNotify(`❌ Errore: ${data.message}`, "error");
+        setMessage(` Errore: ${data.message}`);
+        onNotify && onNotify(` Errore: ${data.message}`, "error");
       }
     } catch (err) {
       console.error("Errore durante l'upload:", err);
-      setMessage("❌ Errore durante il caricamento.");
-      onNotify && onNotify("❌ Errore durante il caricamento.", "error");
+      setMessage(" Errore durante il caricamento.");
+      onNotify && onNotify(" Errore durante il caricamento.", "error");
     }
   };
 
@@ -69,12 +69,12 @@ function UploadMedia({ onNotify, theme, onUploadSuccess }) {
     setTitle("");
     setFile(null);
     setPreviewUrl(null);
-    setMessage("❌ Upload annullato.");
+    setMessage(" Upload annullato.");
   };
 
   return (
     <div style={{ padding: "2rem", color: theme.color, backgroundColor: theme.background }}>
-      <h2>📤 Carica un Media</h2>
+      <h2> Carica un Media</h2>
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1rem" }}>

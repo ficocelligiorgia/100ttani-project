@@ -4,13 +4,13 @@ export const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => {
-    // Recupera da localStorage all'avvio
+    
     const stored = localStorage.getItem("cartItems");
     return stored ? JSON.parse(stored) : [];
   });
 
   useEffect(() => {
-    // Ogni volta che cambia, salva nel localStorage
+    
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 

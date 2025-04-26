@@ -68,4 +68,40 @@ router.post(
   }
 );
 
+// ✅ AGGIUNTA: Votare un'opzione del sondaggio
+router.post("/:id/vote", async (req, res) => {
+  try {
+    const { optionIndex } = req.body;
+    const event = await Event.findById(req.params.id);
+
+    if (!event || !event.poll || !event.poll.options[optionIndex]) {
+      return res.status(404).json({ error: "Evento o opzione non trovati" });
+    }
+
+    event.poll.options[optionIndex].votes += 1;
+    await event.save();
+
+    res.json({ message: "Voto registrato con successo" });
+  } catch (err) {
+    console.error("❌ Errore nella votazione:", err);
+    res.status(500).json({ error: "Errore nella votazione" });
+  }
+});
+
+// ✅ AGGIUNTA: Eliminare un evento (solo admin/staff)
+router.delete("/:id", verifyToken, authorizeRoles("admin", "staff"), async (req, res) => {
+  try {
+    const event = await Event.findByIdAndDelete(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ error: "Evento non trovato" });
+    }
+
+    res.json({ message: "Evento eliminato con successo" });
+  } catch (err) {
+    console.error("❌ Errore nella cancellazione evento:", err);
+    res.status(500).json({ error: "Errore nella cancellazione evento" });
+  }
+});
+
 module.exports = router;

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { FaTimes, FaTrashAlt } from "react-icons/fa";
 import CheckoutPage from "./CheckoutPage";
-import { CartContext } from "./CartContext"; // importa il contesto
+import { CartContext } from "./CartContext"; 
 
 const CartDrawer = ({ isOpen, onClose, theme, isAuthenticated }) => {
   const [showCheckout, setShowCheckout] = useState(false);

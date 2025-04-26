@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logoLight from "../assets/logo4.png"; // logo chiaro
+import logoLight from "../assets/logo4.png"; 
 import { FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 
 function Home({ theme, isLoggedIn, onNavigate, onShowLogin }) {
