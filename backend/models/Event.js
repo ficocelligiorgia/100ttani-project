@@ -9,7 +9,7 @@ const eventSchema = new mongoose.Schema({
     lat:{ type: Number, required:false},
     lng:{ type: Number, required:false},
   },
-  image: String, // URL o percorso immagine
+  image: String, 
   poll: {
     question: String,
     options: [

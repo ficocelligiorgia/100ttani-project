@@ -19,11 +19,11 @@ const productSchema = new mongoose.Schema({
     default: "",
   },
   images: {
-    type: [String], // array di path immagine, es. ["/uploads/img1.jpg", "/uploads/img2.jpg"]
+    type: [String], 
     default: [],
   },
 }, {
-  timestamps: true, // opzionale: salva anche createdAt e updatedAt
+  timestamps: true, 
 });
 
 module.exports = mongoose.model("Product", productSchema);

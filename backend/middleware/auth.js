@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// Middleware per verificare la presenza e validità del token JWT
+
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -20,7 +20,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Middleware per autorizzare ruoli specifici (es: admin, staff)
+
 const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-// Schema per singolo articolo nel carrello
+
 const CartItemSchema = new mongoose.Schema(
   {
     productId: {
@@ -15,10 +15,10 @@ const CartItemSchema = new mongoose.Schema(
       default: 1,
     },
   },
-  { _id: false } // non generare ID separato per ogni item
+  { _id: false } 
 );
 
-// Schema principale del carrello utente
+
 const CartSchema = new mongoose.Schema(
   {
     userId: {
@@ -33,7 +33,7 @@ const CartSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // createdAt / updatedAt
+    timestamps: true, 
   }
 );
 

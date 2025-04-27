@@ -50,7 +50,7 @@ function Navbar({
           </>
         )}
 
-        {/* ☀️ / 🌙 */}
+        
         <button
           onClick={onToggleTheme}
           title="Cambia tema"

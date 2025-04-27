@@ -56,7 +56,7 @@ function App() {
       const payload = JSON.parse(atob(jwtToken.split(".")[1]));
       return payload.role || "";
     } catch (err) {
-      console.error("❌ Errore nella decodifica del token", err);
+      console.error(" Errore nella decodifica del token", err);
       return "";
     }
   };
